@@ -1,0 +1,58 @@
+{
+  "name": "WikiPopularity",
+  "version": "1.0",
+  "manifest_version": 2,
+
+  "web_accessible_resources": [ "popup/popup_box.htm","popup/plotly-latest.min.js",
+                                "js/10k_most_common-cat.txt","icons/top_logo.png",
+                                "icons/top_logo_2.png","js/highlighter.js",
+                                "js/20k_most_common-content.txt","js/20k_most_common-content2.txt",
+                                "js/20k_most_common-importance.txt","icons/top_logo_homepage.png",
+                                "icons/wikilogo_new.png","popup/drop_down_logo.png",
+                                "popup/popular_articles.html",
+                                "popup/popular_articles_generator.js",
+                                "js/20k_most_common_float-content.txt",
+                                "js/highlighter_float.js",
+                                "js/which.txt"],
+
+  "description": "Display view data on all Wikipedia articles",
+
+  "homepage_url": "http://bfaure.us",
+
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+
+  "default_locale": "en",
+
+  "background": {
+    "scripts": ["js/background.js"],
+    "persistent": true
+  },
+
+  "browser_action": {
+    "default_icon": "icons/icon16.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["https://*.wikipedia.org/*"],
+      "js": ["popup/popup.js"],
+      "css": ["icons/logo.css"]
+    }
+  ],
+
+  "options_page":"options/options.html",
+
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+
+  "permissions": [
+    "activeTab",
+    "background",
+    "tabs",
+    "<all_urls>",
+    "storage"
+  ]
+}

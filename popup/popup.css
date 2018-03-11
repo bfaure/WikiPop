@@ -1,0 +1,132 @@
+body
+{
+    color:              black;
+    background-color:   #f8f9fa;
+}
+
+p
+{
+	font-size: 12px;
+}
+
+h1
+{
+	text-align: center;
+}
+
+h1 span
+{
+	background-color: aliceblue;
+}
+
+h2
+{
+	text-align: center;
+}
+
+h2 span
+{
+	background-color: aliceblue;
+}
+
+.frame_logo 
+{
+	display: block;
+    margin: 0 auto;
+    margin-bottom: 10px;
+	/*width: 100px;*/
+	height: 60px;
+}
+
+.bg-text_lite {
+    background-color: #efefef;
+    overflow: hidden;
+    padding: 1px 1px 1px 1px;
+    position: center;
+    font-weight: bold;
+    font-size: 12px;
+    text-align: center;
+}
+
+.bg-text {
+    background-color: #efefef;
+    overflow: hidden;
+    padding: 1px 1px 1px 1px;
+    position: center;
+    font-weight: bold;
+    font-size: 12px;
+    text-align: center;
+}
+
+.chip_color
+{
+    display: inline-block;
+    height: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 12px;
+    padding: 10px;
+    border-radius: 16px;
+    margin-bottom: 0px;
+    margin-right: 0px;
+
+    position: center;
+}
+
+.white-text
+{
+    color: #FFFFFF !important;
+}
+
+.black-text
+{
+    font-size: 12px;
+    text-align: left;
+    margin-left: 15px;
+}
+
+a
+{
+    font-size: 12px;
+}
+
+.Featured{
+    background-color: #00FF65 !important;
+}
+.A-Class{
+    background-color: #00FF00 !important;
+}
+.Good{
+    background-color: #65FF00 !important;
+}
+.B{
+    background-color: #CCFF00 !important;
+}
+.C{
+    background-color: #FFCC00 !important;
+}
+.Start{
+    background-color: #FF6600 !important;
+}
+.Stub{
+    background-color: #FF0000 !important;   
+}
+.Unknown{
+    background-color: #808080 !important;      
+}
+.List{
+    background-color: #808080 !important;
+}
+
+.Low{
+    background-color: #FF0000 !important;      
+}
+.Mid{
+    background-color: #FFCC00 !important;
+}
+.High{
+    background-color: #65FF00 !important;
+}
+.Top{
+    background-color: #00FF65 !important;
+}

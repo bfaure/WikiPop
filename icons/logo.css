@@ -1,0 +1,92 @@
+
+
+#puzzle_piece_logo img{
+	/*position: fixed;*/
+	/*
+	position: absolute;
+	top: -2px;
+	left: 28px;
+	z-index: 2147483647;
+	width: 90px;
+	height: 68px;
+	*/
+	position: absolute;
+	top: -4px;
+	left: 28px;
+	z-index: 2147483647;
+	width: 104px;
+	height: 74px;
+}
+
+#puzzle_piece_logo{
+	/*display: block;*/
+	/*position: relative;*/
+	top: 0px;
+	/*position: fixed;*/
+	/*position: absolute;*/
+
+}
+
+@media screen and (min-width: 982px){
+	#puzzle_piece_logo img{
+		left: 36px;
+	}
+}
+
+#puzzle_piece_logo_homepage a{
+	display: flex;
+  	justify-content: center;
+}
+
+#puzzle_piece_logo_homepage img{
+	/*position: fixed;*/
+	/*vertical-align: middle;*/
+	/*
+	position: absolute;
+	top: -2px;
+	left: 28px;
+	z-index: 2147483647;
+	*/
+	/*position: absolute;*/
+	/*top: 138px;*/
+	/*left: 41%;*/
+	/*display: block*/
+	/*vertical-align: center;*/
+	/*
+	display: block;
+    margin-left: auto;
+    margin-right: auto;
+    */
+	/*z-index: 2147483647;*/
+
+	/*position: relative;*/
+	position: absolute;
+	top: 140px;
+
+	width: 198px;
+	height: 138px;
+	/*border-right: 100px;*/
+}
+
+
+#puzzle_piece_logo_homepage{
+
+	/*display: block;*/
+	/*position: relative;*/
+	/*vertical-align: middle;*/
+	display: flex;
+  	justify-content: center;
+	/*position: fixed;*/
+	/*position: absolute;*/
+	/*display: block;*/
+	/*top: 138px;
+	left:100px;*/
+}
+
+/*
+@media screen and (min-width: 982px){
+	#puzzle_piece_logo_homepage img{
+		left: 35px;
+	}
+}
+*/
