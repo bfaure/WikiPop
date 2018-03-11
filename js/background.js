@@ -7,16 +7,6 @@ function get_http_xml(url)
 	return xml_http.responseText;
 }
 
-/*
-chrome.browserAction.onClicked.addListener(function() {
-    chrome.tabs.executeScript(null, {file: "js/highlighter.js"});
-});
-*/
-
-chrome.browserAction.onClicked.addListener(function() {
-    chrome.tabs.executeScript(null, {file: "js/highlighter_float.js"});
-});
-
 chrome.runtime.onMessage.addListener(
 	function(meta, sender, sendResponse)
 {

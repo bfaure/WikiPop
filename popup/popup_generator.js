@@ -244,7 +244,7 @@ function make_view_plot(article_name)
 
 	var volume_trace =
 	{
-		name: "Volume",
+		name: "Views",
 		x: daily_views.x,
 		y: daily_views.y,
 		type: 'scatter',

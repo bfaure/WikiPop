@@ -4,16 +4,9 @@
   "manifest_version": 2,
 
   "web_accessible_resources": [ "popup/popup_box.htm","popup/plotly-latest.min.js",
-                                "js/10k_most_common-cat.txt","icons/top_logo.png",
-                                "icons/top_logo_2.png","js/highlighter.js",
-                                "js/20k_most_common-content.txt","js/20k_most_common-content2.txt",
-                                "js/20k_most_common-importance.txt","icons/top_logo_homepage.png",
-                                "icons/wikilogo_new.png","popup/drop_down_logo.png",
                                 "popup/popular_articles.html",
-                                "popup/popular_articles_generator.js",
-                                "js/20k_most_common_float-content.txt",
-                                "js/highlighter_float.js",
-                                "js/which.txt"],
+                                "popup/popular_articles_generator.js"
+								],
 
   "description": "Display view data on all Wikipedia articles",
 
@@ -43,8 +36,6 @@
       "css": ["icons/logo.css"]
     }
   ],
-
-  "options_page":"options/options.html",
 
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 
