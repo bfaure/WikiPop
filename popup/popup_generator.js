@@ -295,7 +295,7 @@ function make_view_plot(article_name)
 
 	var plot_spot = document.getElementById('plot');
 	//var data = [short_moving_avg_trace,long_moving_avg_trace,volume_trace];
-	var data = [short_moving_avg_trace,long_moving_avg_trace];
+	var data = [short_moving_avg_trace,long_moving_avg_trace,volume_trace];
 
 	Plotly.plot
 	(
@@ -308,60 +308,6 @@ function make_view_plot(article_name)
 	var ret_arr = [average_views,views_last_week];
 	return ret_arr;
 	//return average_views;
-}
-
-// gets the number of revisions of this article in past week
-function get_revision_history(article_name)
-{
-	
-	var t0 = new Date();
-	t0.setDate(t0.getDate()-8); // 8 days ago
-	t0 = t0.toISOString();
-
-	var t1 = new Date();
-	t1.setDate(t1.getDate()-1); // yesterday
-	t1 = t1.toISOString(); // current timestamp
-	
-	var url="https://en.wikipedia.org/w/api.php?action=query&format=json&prop=revisions";
-	url += "&titles="+article_name;
-	url += "&rvlimit=5000";
-	url += "&rvprop=user";
-	url += "&rvstart="+t1;
-	url += "&rvend="+t0;
-
-	// request the json from mediawiki
-	var rev_data = get_http_xml(url);
-	rev_data     = JSON.parse(rev_data);
-
-	if ("query" in rev_data)
-	{
-		if ("pages" in rev_data.query)
-		{
-			for (var key in rev_data.query.pages)
-			{
-				try
-				{
-					return rev_data.query.pages[key].revisions.length;
-				}
-				catch(err)
-				{
-					continue;
-				}
-			}
-		}
-	}
-	return 0;
-}
-
-// get data from our database for current article
-function get_database_entry(article_name,callback)
-{
-	article_name = String(article_name).split("%27").join("&squot"); // listed on database with &squot in name
-	var url = "http://www.wikiclassify.com/articles/"+article_name;
-	chrome.runtime.sendMessage({func: "get_remote_data", url: url}, function(response)
-	{
-		callback(String(response.data));
-	});
 }
 
 // Provided a referenced to a callback function, finds the URL of the
@@ -382,18 +328,6 @@ function process_url(tablink)
 		return;
 	}
 
-	/*
-	var after_slash = tablink.split(".org/wiki/")[1];
-	after_slash = after_slash.split("%27").join("&squot");
-	var logo_anchor = document.getElementById("top_logo");
-	var logo_string = "<a id=\"top_logo\" href=\"http://www.wikiclassify.com/articles/"+after_slash+"\", target=\"_blank\">";
-	logo_string+="<img class=\"frame_logo\" src=\"logo_lg.png\" alt=\"icon\">"
-	$(logo_anchor).html(logo_string);
-	*/
-
-	//$("body").append("<hr>");
-	//$("body").append("<div class=\"bg-text_lite\">Information</div>");
-
 	// get the article name
 	var article = tablink.split("/wiki/")[1];
 	article = article.split("#")[0]; // remove extra in url specifying part of page to load to
@@ -405,42 +339,6 @@ function process_url(tablink)
 	article_pretty = article_pretty.split("%C3%A9").join("é");
 	article_pretty = article_pretty.split("%C3%97").join("x").split("%26").join("&");
 
-	/*
-	var article_line = "<b>Article</b>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+article_pretty;
-	$("body").append("<p>"+article_line+"</p>"); // title
-	$("body").append("<p id=\"quality_anchor\"><b>Quality</b> ...</p>"); // insert point for when get_remote_data() is called
-	$("body").append("<p id=\"importance_anchor\"><b>Importance</b> ...</p>"); // insert point for when get_remote_data() is called
-	$("body").append("<p id=\"source_quality_anchor\"><b>Link Quality</b> ...</p>"); // insert point for when get_remote_data() is called
-	$("body").append("<p id=\"related_anchor\"><b>Related Articles</b> ...</p>"); // insert point for when get_remote_data() is called
-
-	// categories slider
-	var categories_container = "<div><p class=\"category_expander\"><b>Categories </b>";
-	categories_container += "<img src=\"drop_down_logo.png\" width=\"30\" height=\"20\" align=\"right\"/></p>";
-	categories_container += "<p id=\"category_anchor\" class=\"category_content\"> ...</p></div>";
-	$("body").append(categories_container);
-	$('.category_expander').click(function(){
-		$('.category_content').slideToggle('slow');
-	});
-
-	// authors slider
-	var authors_container = "<div><p class=\"authors_expander\"><b>Cited Authors</b>";
-	authors_container += "<img src=\"drop_down_logo.png\" width=\"30\" height=\"20\" align=\"right\"/></p>";
-	authors_container += "<p id=\"authors_anchor\" class=\"authors_content\"> ...</p></div>";
-	$("body").append(authors_container);
-	$('.authors_expander').click(function(){
-		$('.authors_content').slideToggle('slow');
-	});
-
-	// domains slider
-	var domains_container = "<div><p class=\"domains_expander\"><b>Cited Domains</b>";
-	domains_container += "<img src=\"drop_down_logo.png\" width=\"30\" height=\"20\" align=\"right\"/></p>";
-	domains_container += "<p id=\"domains_anchor\" class=\"domains_content\"> ...</p></div>";
-	$("body").append(domains_container);
-	$('.domains_expander').click(function(){
-		$('.domains_content').slideToggle('slow');
-	});
-	*/
-
 
 	$("body").append("<div class=\"bg-text\">Popularity</div>");
 	
@@ -449,7 +347,7 @@ function process_url(tablink)
 	var views_last_week = views_arr[1];
 
 	var avg_daily_views_pretty = String(avg_daily_views.toLocaleString('en-US',{minimumFractionDigits: 2})).split(".")[0];
-	var avg_daily_views_line = "<b>Views</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+avg_daily_views_pretty+" / day";
+	var avg_daily_views_line = "<b>Average Views</b>&nbsp;&nbsp;"+avg_daily_views_pretty+" / day";
 	$("body").append("<p>"+avg_daily_views_line+"</p>");
 
 	// check if a trending article
@@ -459,49 +357,8 @@ function process_url(tablink)
 		var trending_line = "<b>Trending</b> &nbsp;#"+String(rank)+" Yesterday";
 		$("body").append("<p>"+trending_line+"</p>");
 	}
-
-	var revisions_last_week = get_revision_history(article);
-	var revisions_line = "<b>Revisions</b>&nbsp;&nbsp;"+String(revisions_last_week)+" Last Week";
-	$("body").append("<p>"+revisions_line+"</p>");
-
-	if (revisions_last_week!=0)
-	{
-		var views_per_revision_pretty = String((views_last_week/revisions_last_week).toLocaleString('en-US',{minimumFractionDigits: 2})).split(".")[0]
-		var revisions_line = "<b>Views/Revision</b>&nbsp;&nbsp;"+String(views_per_revision_pretty)+" Last Week";
-		$("body").append("<p>"+revisions_line+"</p>");
-	}
-
-	/*
-	$("body").append("<hr>");
-
-	// see the top of file for mapping names and colors
-	var row_len=3;
-	var cat_s="";
-	for (var cat_idx=0; cat_idx<possible_cats.length; cat_idx++)
-	{
-		var cat_c = all_colors[cat_idx];
-		cat_s += "<font style=\'color:black; background-color:rgba";
-		cat_s += "("+String(cat_c[0])+","+String(cat_c[1])+","+String(cat_c[2])+",0.4);\'>";
-		cat_s += "<b>"+possible_cats[cat_idx]+"</b></font>";
-		
-		if (((cat_idx+1)%row_len)==0)
-		{
-			$("body").append("<p>"+cat_s+"</p>");
-			cat_s="";
-		}
-		else
-		{
-			if (cat_idx!=possible_cats.length-1) {  cat_s+="&nbsp;&nbsp;";  }
-		}
-	}
-	if (cat_s!=""){  $("body").append("<p>"+cat_s+"</p>");  }
-	*/
-
-	// add data from our server	get_database_entry(article,add_remote_data);
-	//get_database_entry(article,add_remote_data);
 }
 
 function jQueryMain () {
 	get_url(process_url);
 }
-

@@ -18,42 +18,6 @@ function get_url(callback)
 	});
 }
 
-// places the blue logo on the top of the wikipedia globe
-function set_top_logo()
-{
-	var div = document.createElement("DIV");
-	div.id = "puzzle_piece_logo";
-	var img = document.createElement("IMG");
-	img.src = chrome.extension.getURL("/icons/wikilogo_new.png");
-	div.appendChild(img);
-	/*
-	var a = document.createElement("a");
-	a.href = "http://www.wikiclassify.com";
-	a.target = "_blank";
-	a.appendChild(img);
-	div.appendChild(a);
-	*/
-	document.body.appendChild(div);
-}
-
-// places the blue logo on the wikipedia globe on the home page
-function set_middle_logo()
-{
-	var div = document.createElement("DIV");
-	div.id = "puzzle_piece_logo_homepage";
-	var img = document.createElement("IMG");
-	img.src = chrome.extension.getURL("/icons/wikilogo_new.png");
-	div.appendChild(img);
-
-	/*
-	var a = document.createElement("a");
-	a.href = "http://www.wikiclassify.com";
-	a.target = "_blank";
-	a.appendChild(img);
-	div.appendChild(a);
-	*/
-	document.body.appendChild(div);
-}
 
 function set_list_elems()
 {
@@ -81,43 +45,17 @@ function set_list_elems()
 	panel_list.id = "wikipanel-list";
 	panel_body.appendChild(panel_list);
 
-	var panel_list_entry = document.createElement("li");
-	panel_list.appendChild(panel_list_entry);
-
-	var panel_list_entry_link = document.createElement("a");
-	panel_list_entry.appendChild(panel_list_entry_link);
-
-	panel_list_entry_link.href = "http://www.wikiclassify.com";
-	panel_list_entry_link.target = "_blank";
-	panel_list_entry_link.innerText = "Visit WikiClassify";
-
 	var panel_trending_entry = document.createElement("li");
 	panel_list.appendChild(panel_trending_entry);
 
 	var panel_trending_link = document.createElement("a");
 	panel_trending_entry.appendChild(panel_trending_link);
 	
-	// implementation where it would open a page on our website
-	/*
-	panel_trending_link.href = "http://www.wikiclassify.com/trending";
-	panel_trending_link.target = "_blank";
-	panel_trending_link.innerText = "Trending Articles";
-	*/
-	// implementation where we open a local html file with trending articles
-	//panel_trending_link.href = "popup/popular_articles.html";
 	panel_trending_link.href = chrome.extension.getURL("popup/popular_articles.html");
 	panel_trending_link.target = "_blank";
 	panel_trending_link.innerText = "Trending Articles";
 
 	panel.insertBefore(new_panel_elem,first_panel_elem);
-
-	console.log("here");
-}
-
-// gets the coordinates for the current article
-function get_article_coords()
-{
-	return;
 }
 
 function add_sizing_elems()
@@ -127,30 +65,17 @@ function add_sizing_elems()
 	var expand_elem_entry = document.createElement("li");
 	panel_list.appendChild(expand_elem_entry);
 
-	var collapse_elem_entry = document.createElement("li");
-	panel_list.appendChild(collapse_elem_entry);
-
 	var expand_link = document.createElement("a");
-	var collapse_link = document.createElement("a");
 
 	expand_link.innerText = "Expand Frame";
-	collapse_link.innerText = "Collapse Frame";
 
 	expand_link.onclick = function()
 	{
 		document.getElementById("wiki_frame").style.display = '';
-		document.getElementById("wiki_frame").height=670;
-	}
-
-	collapse_link.onclick = function()
-	{
-		document.getElementById("wiki_frame").style.display = '';
-		document.getElementById("wiki_frame").height=200;
+		document.getElementById("wiki_frame").height=220;
 	}
 
 	expand_elem_entry.appendChild(expand_link);
-	collapse_elem_entry.appendChild(collapse_link);
-
 
 	var hide_elem_entry = document.createElement("li");
 	panel_list.appendChild(hide_elem_entry);
@@ -175,7 +100,6 @@ function process_url(url)
 	// if this is the home page
 	if (url=="https://www.wikipedia.org/" || url=="https://www.wikipedia.org")
 	{
-		set_middle_logo();
 		return;
 	}
 
@@ -191,15 +115,11 @@ function process_url(url)
 	// create iFrame element to insert later
 	var iFrame = document.createElement("iframe");
 	iFrame.id="wiki_frame";
-	//iFrame.setAttribute("id","wiki_frame");
 
 	iframe_container.appendChild(iFrame);
 
 	iFrame.src = chrome.extension.getURL("popup/popup_box.htm");
 	iFrame.style = "border:1px solid #a6a6a6;";
-
-	// place the top-of-globe logo
-	set_top_logo();
 
 	// if this is the main page, skip
 	if (url=="https://en.wikipedia.org/wiki/Main_Page")
@@ -213,12 +133,9 @@ function process_url(url)
 		return;
 	}
 
-	// get the coordinates of the current article (if they exist)
-	//var coords = get_article_coords();
-
 	// width is set to match the width of the existing box on the article page
-	iFrame.width = "300";
-	iFrame.height = "240";
+	iFrame.width = "280";
+	iFrame.height = "220";
 	iFrame.align = "right";
 
 	add_sizing_elems();

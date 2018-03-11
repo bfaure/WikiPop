@@ -29,6 +29,7 @@ h2 span
 	background-color: aliceblue;
 }
 
+
 .frame_logo 
 {
 	display: block;
@@ -37,6 +38,7 @@ h2 span
 	/*width: 100px;*/
 	height: 60px;
 }
+
 
 .bg-text_lite {
     background-color: #efefef;
