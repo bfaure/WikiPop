@@ -165,8 +165,8 @@ function make_view_plot(article_name)
 		y: [],
 	}
 
-	var n_days_long = 26;
-	var n_days_short = 12;
+	var n_days_long = 50;
+	var n_days_short = 7;
 
 	var total_views = 0;
 
