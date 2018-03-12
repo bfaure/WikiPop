@@ -103,47 +103,51 @@ function process_url(url)
 		return;
 	}
 
-	// set the WikiClassify list elements in the left panel
-	set_list_elems();
+  	chrome.storage.sync.get("enabled",function(obj){
+    	if (obj["enabled"]=="true" || obj===null)
+    	{
+			// set the WikiClassify list elements in the left panel
+			set_list_elems();
 
-	var iframe_container = document.createElement("div");
-	iframe_container.id = "wiki_frame_container";
-	iframe_container.className = "resizeable";
-	iframe_container.resize="both";
-	iframe_container.overflow="auto";
+			var iframe_container = document.createElement("div");
+			iframe_container.id = "wiki_frame_container";
+			iframe_container.className = "resizeable";
+			iframe_container.resize="both";
+			iframe_container.overflow="auto";
 
-	// create iFrame element to insert later
-	var iFrame = document.createElement("iframe");
-	iFrame.id="wiki_frame";
+			// create iFrame element to insert later
+			var iFrame = document.createElement("iframe");
+			iFrame.id="wiki_frame";
 
-	iframe_container.appendChild(iFrame);
+			iframe_container.appendChild(iFrame);
 
-	iFrame.src = chrome.extension.getURL("popup/popup_box.htm");
-	iFrame.style = "border:1px solid #a6a6a6;";
+			iFrame.src = chrome.extension.getURL("popup/popup_box.htm");
+			iFrame.style = "border:1px solid #a6a6a6;";
 
-	// if this is the main page, skip
-	if (url=="https://en.wikipedia.org/wiki/Main_Page")
-	{
-		return;
-	}
+			// if this is the main page, skip
+			if (url=="https://en.wikipedia.org/wiki/Main_Page")
+			{
+				return;
+			}
 
-	// if this is not an article page, skip
-	if (url.split(".org")[1].indexOf(":")!=-1)
-	{
-		return;
-	}
+			// if this is not an article page, skip
+			if (url.split(".org")[1].indexOf(":")!=-1)
+			{
+				return;
+			}
 
-	// width is set to match the width of the existing box on the article page
-	iFrame.width = "280";
-	iFrame.height = "220";
-	iFrame.align = "right";
+			// width is set to match the width of the existing box on the article page
+			iFrame.width = "280";
+			iFrame.height = "220";
+			iFrame.align = "right";
 
-	add_sizing_elems();
+			add_sizing_elems();
 
-	var insert_parent = document.getElementById("mw-content-text");
-	var insert_spot = insert_parent.childNodes[0];
-	insert_parent.insertBefore(iframe_container,insert_spot);
-
+			var insert_parent = document.getElementById("mw-content-text");
+			var insert_spot = insert_parent.childNodes[0];
+			insert_parent.insertBefore(iframe_container,insert_spot);
+    	}
+  	});
 }
 
 // Call get_url function with the process_url function being called

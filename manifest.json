@@ -5,7 +5,8 @@
 
   "web_accessible_resources": [ "popup/popup_box.htm","popup/plotly-latest.min.js",
                                 "popup/popular_articles.html",
-                                "popup/popular_articles_generator.js"
+                                "popup/popular_articles_generator.js",
+                                "options.html"
 								],
 
   "description": "Display view data on all Wikipedia articles",
@@ -24,6 +25,8 @@
     "scripts": ["js/background.js"],
     "persistent": true
   },
+
+  "options_page": "options/options.html",
 
   "browser_action": {
     "default_icon": "icons/icon16.png"
