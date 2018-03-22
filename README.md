@@ -11,4 +11,5 @@ Most recent version can be installed in the Chrome Extension store, simply searc
 
 ## Future Improvements
 1. Add support for parsing & presenting IMDB scores when the user is on an article for a movie or TV show.
-#. Send me a message or email at bfaure23@gmail.com to suggest new features!
+
+n. Send me a message or email at bfaure23@gmail.com to suggest new features!
