@@ -399,7 +399,8 @@ function process_url(tablink)
 	var rating_arr = get_imdb_rating(article);
 	if (rating_arr!=null)
 	{
-		var rating_line = "<b>IMDB Rating</b> &nbsp;&nbsp;&nbsp;&nbsp;"+rating_arr[0]+" ("+rating_arr[1]+" reviews)";
+		var count_pretty=String(parseInt(rating_arr[1]).toLocaleString('en-US',{minimumFractionDigits: 2})).split(".")[0];
+		var rating_line = "<b>IMDB Rating</b> &nbsp;&nbsp;&nbsp;&nbsp;"+rating_arr[0]+" ("+count_pretty+" reviews)";
 		$("body").append("<p>"+rating_line+"</p>");
 	}
 }
