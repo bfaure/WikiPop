@@ -320,6 +320,55 @@ function get_url(callback)
 	});
 }
 
+// fetches the imdb rating of the current article (if article is about a movie or tv show)
+function get_imdb_rating(article_name)
+{
+	var fileURL = chrome.extension.getURL("data/data.tsv");
+	var xmlreq = new XMLHttpRequest();
+	xmlreq.open("GET",fileURL,false);
+	xmlreq.send();
+	mapping=xmlreq.responseText.split("\n");
+
+	mapping_dict={};
+	for (var line_idx=0; line_idx<mapping.length; line_idx++)
+	{
+		line_items=mapping[line_idx].split("\t");
+		if (line_items.length==3 && line_items[0]!="title")
+		{
+			mapping_dict[line_items[0]]=[line_items[1],line_items[2]];
+		}
+	}
+
+	if (article_name in mapping_dict)
+	{
+		return mapping_dict[article_name];
+	}
+
+	title_lowercase=article_name.toLowerCase();
+	if (title_lowercase in mapping_dict)
+	{
+		console.log(title_lowercase);
+		return mapping_dict[title_lowercase];
+	}
+
+	title_spaces=article_name.split("_").join(" ");
+	if (title_spaces in mapping_dict)
+	{
+		console.log(title_spaces);
+		return mapping_dict[title_spaces];
+	}
+
+	title_spaces_cut=title_spaces.split(" (")[0];
+	console.log(title_spaces_cut);
+	if (title_spaces_cut in mapping_dict)
+	{
+		console.log(title_spaces_cut);
+		return mapping_dict[title_spaces_cut];
+	}
+	return null;
+}
+
+
 function process_url(tablink)
 {
 	// if this will be a banner, don't add content
@@ -349,9 +398,15 @@ function process_url(tablink)
 	var avg_daily_views_pretty = String(avg_daily_views.toLocaleString('en-US',{minimumFractionDigits: 2})).split(".")[0];
 	var avg_daily_views_line = "<b>Average Views</b>&nbsp;&nbsp;"+avg_daily_views_pretty+" / day";
 	$("body").append("<p>"+avg_daily_views_line+"</p>");
-	//$("body").append("<p>"+avg_daily_views_line);
 
-	
+	// if the article is for a movie or tv show, this function will return the 
+	// imdb rating (and the number of votes it received)
+	var rating_arr = get_imdb_rating(article);
+
+	console.log(rating_arr);
+
+
+
 	/*
 	// check if a trending article
 	var rank = get_view_ranking(article);

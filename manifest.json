@@ -6,7 +6,8 @@
   "web_accessible_resources": [ "popup/popup_box.htm","popup/plotly-latest.min.js",
                                 "popup/popular_articles.html",
                                 "popup/popular_articles_generator.js",
-                                "options.html"
+                                "options.html",
+                                "data/data.tsv"
 								],
 
   "description": "Display view data on all Wikipedia articles",
