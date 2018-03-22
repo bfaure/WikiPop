@@ -1,3 +1,4 @@
+var background = chrome.extension.getBackgroundPage();
 
 $(document).ready (jQueryMain);
 
@@ -323,21 +324,8 @@ function get_url(callback)
 // fetches the imdb rating of the current article (if article is about a movie or tv show)
 function get_imdb_rating(article_name)
 {
-	var fileURL = chrome.extension.getURL("data/data.tsv");
-	var xmlreq = new XMLHttpRequest();
-	xmlreq.open("GET",fileURL,false);
-	xmlreq.send();
-	mapping=xmlreq.responseText.split("\n");
-
-	mapping_dict={};
-	for (var line_idx=0; line_idx<mapping.length; line_idx++)
-	{
-		line_items=mapping[line_idx].split("\t");
-		if (line_items.length==3 && line_items[0]!="title")
-		{
-			mapping_dict[line_items[0]]=[line_items[1],line_items[2]];
-		}
-	}
+	// dictionary from title to [average rating, number of reviews]
+	var mapping_dict=background.mapping_dict;
 
 	if (article_name in mapping_dict)
 	{
@@ -359,7 +347,6 @@ function get_imdb_rating(article_name)
 	}
 
 	title_spaces_cut=title_spaces.split(" (")[0];
-	console.log(title_spaces_cut);
 	if (title_spaces_cut in mapping_dict)
 	{
 		console.log(title_spaces_cut);
@@ -399,27 +386,22 @@ function process_url(tablink)
 	var avg_daily_views_line = "<b>Average Views</b>&nbsp;&nbsp;"+avg_daily_views_pretty+" / day";
 	$("body").append("<p>"+avg_daily_views_line+"</p>");
 
-	// if the article is for a movie or tv show, this function will return the 
-	// imdb rating (and the number of votes it received)
-	var rating_arr = get_imdb_rating(article);
-
-	console.log(rating_arr);
-
-
-
-	/*
 	// check if a trending article
 	var rank = get_view_ranking(article);
 	if (rank!=-1)
 	{
-		var trending_line = "<b>Trending</b> &nbsp;#"+String(rank)+" Yesterday";
+		var trending_line = "<b>Trending</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#"+String(rank)+" Yesterday";
 		$("body").append("<p>"+trending_line+"</p>");
-
-		var iframe = document.getElementById("wiki_frame");
-		console.log(iframe);
-		iframe.height="400";
 	}
-	*/
+
+	// if the article is for a movie or tv show, this function will return the 
+	// imdb rating (and the number of votes it received)
+	var rating_arr = get_imdb_rating(article);
+	if (rating_arr!=null)
+	{
+		var rating_line = "<b>IMDB Rating</b> &nbsp;&nbsp;&nbsp;&nbsp;"+rating_arr[0]+" ("+rating_arr[1]+" reviews)";
+		$("body").append("<p>"+rating_line+"</p>");
+	}
 }
 
 function jQueryMain () {
