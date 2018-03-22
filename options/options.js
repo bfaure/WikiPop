@@ -22,23 +22,20 @@ function save_options() {
 function restore_options() {
   
   // Loading all data from localStorage...
-  chrome.storage.sync.get("enabled",function(data){
-    is_enabled=data["enabled"];
+  chrome.storage.sync.get({"enabled":"true"},function(data){
+    var is_enabled=data["enabled"];
     console.log(data);
     console.log(is_enabled);
-    if (is_enabled=="true")
+    if (is_enabled=="true" || is_enabled===null)
     {
       document.getElementById("enable_checkbox").checked=true;
+      chrome.storage.sync.set({"enabled":"true"},function(){
+        console.log("initalized setting");
+      });
     }
     else
     {
       document.getElementById("enable_checkbox").checked=false;
-      if (is_enabled===null)
-      {
-        chrome.storage.sync.set({"enabled":"true"},function(){
-          console.log("saved setting");
-        });
-      }
     }
   });
 

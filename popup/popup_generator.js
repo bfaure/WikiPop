@@ -349,14 +349,22 @@ function process_url(tablink)
 	var avg_daily_views_pretty = String(avg_daily_views.toLocaleString('en-US',{minimumFractionDigits: 2})).split(".")[0];
 	var avg_daily_views_line = "<b>Average Views</b>&nbsp;&nbsp;"+avg_daily_views_pretty+" / day";
 	$("body").append("<p>"+avg_daily_views_line+"</p>");
+	//$("body").append("<p>"+avg_daily_views_line);
 
+	
+	/*
 	// check if a trending article
 	var rank = get_view_ranking(article);
 	if (rank!=-1)
 	{
 		var trending_line = "<b>Trending</b> &nbsp;#"+String(rank)+" Yesterday";
 		$("body").append("<p>"+trending_line+"</p>");
+
+		var iframe = document.getElementById("wiki_frame");
+		console.log(iframe);
+		iframe.height="400";
 	}
+	*/
 }
 
 function jQueryMain () {

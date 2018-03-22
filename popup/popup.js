@@ -104,7 +104,7 @@ function process_url(url)
 	}
 
   	chrome.storage.sync.get("enabled",function(obj){
-    	if (obj["enabled"]=="true" || obj===null)
+    	if (obj["enabled"]=="true" || obj===null || obj["enabled"]==null)
     	{
 			// set the WikiClassify list elements in the left panel
 			set_list_elems();
