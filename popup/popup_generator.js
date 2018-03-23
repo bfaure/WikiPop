@@ -355,6 +355,34 @@ function get_imdb_rating(article_name)
 	return null;
 }
 
+// Checks the wikimedia API to see if the current article is a film or movie
+function get_article_type(article)
+{
+	var url = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=categories&titles=";
+	url += article+"&clprop=";
+	var data = get_http_xml(url);
+	console.log(data);
+	data     = JSON.parse(data);
+	console.log(data);
+
+	var cont = data.continue;
+	
+	var query = data.query;
+	var pages = query.pages;
+
+	console.log(pages);
+
+	var keys=data.keys();
+	console.log(keys);
+	
+
+	//var next = pages[0];
+
+	//console.log(next);
+
+
+}
+
 
 function process_url(tablink)
 {
@@ -393,6 +421,10 @@ function process_url(tablink)
 		var trending_line = "<b>Trending</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#"+String(rank)+" Yesterday";
 		$("body").append("<p>"+trending_line+"</p>");
 	}
+
+	// returns whether (1) or not (-1) the article pertains to a movie or tv show
+	var article_type = get_article_type(article);
+
 
 	// if the article is for a movie or tv show, this function will return the 
 	// imdb rating (and the number of votes it received)
