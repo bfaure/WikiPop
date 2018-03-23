@@ -50,4 +50,5 @@ for (var line_idx=0; line_idx<mapping.length; line_idx++)
 	}
 }
 
+console.log(document);
 

@@ -441,13 +441,12 @@ function process_url(tablink)
 			var rating_line = "<b>&nbsp;&nbsp;Rating</b> &nbsp;"+rating_arr[0]+" ("+count_pretty+" reviews)";
 
 			var img_src=chrome.extension.getURL("/icons/imdb_logo.png");
-			//var img_line="<img src=\""+String(img_src)+"\" width=\"45\" height=\"20\" align=\"middle\">"
 			var img_line="<img src=\""+String(img_src)+"\">"
 
 			$("body").append("<p>"+img_line+rating_line+"</p>");
 
 			// need to resize the iframe to accomodate the new content
-			console.log(document);
+			
 		}
 	}
 }

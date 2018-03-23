@@ -4,6 +4,13 @@ body
     background-color:   #f8f9fa;
 }
 
+
+iframe
+{
+    height: 100%;
+    width: 100%;
+}
+
 img
 {
     margin-left: auto;
@@ -101,45 +108,4 @@ h2 span
 a
 {
     font-size: 12px;
-}
-
-.Featured{
-    background-color: #00FF65 !important;
-}
-.A-Class{
-    background-color: #00FF00 !important;
-}
-.Good{
-    background-color: #65FF00 !important;
-}
-.B{
-    background-color: #CCFF00 !important;
-}
-.C{
-    background-color: #FFCC00 !important;
-}
-.Start{
-    background-color: #FF6600 !important;
-}
-.Stub{
-    background-color: #FF0000 !important;   
-}
-.Unknown{
-    background-color: #808080 !important;      
-}
-.List{
-    background-color: #808080 !important;
-}
-
-.Low{
-    background-color: #FF0000 !important;      
-}
-.Mid{
-    background-color: #FFCC00 !important;
-}
-.High{
-    background-color: #65FF00 !important;
-}
-.Top{
-    background-color: #00FF65 !important;
 }

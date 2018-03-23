@@ -138,7 +138,8 @@ function process_url(url)
 
 			// width is set to match the width of the existing box on the article page
 			iFrame.width = "280";
-			iFrame.height = "220";
+			iFrame.height = "420";
+
 			iFrame.align = "right";
 
 			add_sizing_elems();
