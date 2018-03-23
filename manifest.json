@@ -7,7 +7,8 @@
                                 "popup/popular_articles.html",
                                 "popup/popular_articles_generator.js",
                                 "options.html",
-                                "data/data.tsv"
+                                "data/data.tsv",
+                                "icons/imdb_logo.png"
 								],
 
   "description": "Display view data on all Wikipedia articles",

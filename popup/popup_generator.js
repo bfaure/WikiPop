@@ -361,26 +361,32 @@ function get_article_type(article)
 	var url = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=categories&titles=";
 	url += article+"&clprop=";
 	var data = get_http_xml(url);
-	console.log(data);
 	data     = JSON.parse(data);
-	console.log(data);
 
-	var cont = data.continue;
-	
-	var query = data.query;
-	var pages = query.pages;
+	var pages = data.query.pages;
+	var first_key = Object.keys(pages)[0];
+	var tags=["film","series","television","show","episode"];
 
-	console.log(pages);
-
-	var keys=data.keys();
-	console.log(keys);
-	
-
-	//var next = pages[0];
-
-	//console.log(next);
-
-
+	if ("categories" in pages[first_key])
+	{
+		var cats=pages[first_key]["categories"];
+		for (var cat_idx=0; cat_idx<cats.length; cat_idx++)
+		{
+			console.log(cats[cat_idx]["title"]);
+			for (var tag_idx=0; tag_idx<tags.length; tag_idx++)
+			{
+				if (cats[cat_idx]["title"].indexOf(tags[tag_idx])!==-1)
+				{
+					// we have found that this article is in a category meant 
+					// only for films and tv shows, so return 1
+					return 1;
+				}				
+			}
+		}
+	}
+	// article categories don't seem to show this article
+	// is a movie or a tv show, return -1
+	return -1; 
 }
 
 
@@ -425,15 +431,24 @@ function process_url(tablink)
 	// returns whether (1) or not (-1) the article pertains to a movie or tv show
 	var article_type = get_article_type(article);
 
-
-	// if the article is for a movie or tv show, this function will return the 
-	// imdb rating (and the number of votes it received)
-	var rating_arr = get_imdb_rating(article);
-	if (rating_arr!=null)
+	if (article_type==1) // if the article is for a tv show or movie
 	{
-		var count_pretty=String(parseInt(rating_arr[1]).toLocaleString('en-US',{minimumFractionDigits: 2})).split(".")[0];
-		var rating_line = "<b>IMDB Rating</b> &nbsp;&nbsp;&nbsp;&nbsp;"+rating_arr[0]+" ("+count_pretty+" reviews)";
-		$("body").append("<p>"+rating_line+"</p>");
+		// fetch the imdb rating (and the number of votes it received)
+		var rating_arr = get_imdb_rating(article);
+		if (rating_arr!=null)
+		{
+			var count_pretty=String(parseInt(rating_arr[1]).toLocaleString('en-US',{minimumFractionDigits: 2})).split(".")[0];
+			var rating_line = "<b>&nbsp;&nbsp;Rating</b> &nbsp;"+rating_arr[0]+" ("+count_pretty+" reviews)";
+
+			var img_src=chrome.extension.getURL("/icons/imdb_logo.png");
+			//var img_line="<img src=\""+String(img_src)+"\" width=\"45\" height=\"20\" align=\"middle\">"
+			var img_line="<img src=\""+String(img_src)+"\">"
+
+			$("body").append("<p>"+img_line+rating_line+"</p>");
+
+			// need to resize the iframe to accomodate the new content
+			console.log(document);
+		}
 	}
 }
 
