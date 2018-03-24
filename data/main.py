@@ -38,6 +38,7 @@ for line in text:
 		count=items[2]
 		try: name=names_dict[tconst]
 		except: continue
+		if name in ratings_dict and ratings_dict[name][1]>count: continue
 		ratings_dict[name]=[rating,count]
 
 print "Saving to data.tsv..."
