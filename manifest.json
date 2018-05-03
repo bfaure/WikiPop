@@ -1,6 +1,6 @@
 {
   "name": "WikiPopularity",
-  "version": "0.0.0.4",
+  "version": "0.0.0.5",
   "manifest_version": 2,
 
   "web_accessible_resources": [ "popup/popup_box.htm","popup/plotly-latest.min.js",
@@ -9,7 +9,7 @@
                                 "options.html",
                                 "data/data.tsv",
                                 "icons/imdb_logo.png"
-								],
+                ],
 
   "description": "Display view data on all Wikipedia articles",
 

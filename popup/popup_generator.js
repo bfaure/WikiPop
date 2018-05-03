@@ -321,8 +321,8 @@ function get_url(callback)
 	});
 }
 
-// fetches the imdb rating of the current article (if article is about a movie or tv show)
-function get_imdb_rating(article_name)
+// fetches the imdb uid for the article, returns null if not movie or tv show
+function get_imdb_id(article_name)
 {
 	// dictionary from title to [average rating, number of reviews]
 	var mapping_dict=background.mapping_dict;
@@ -330,13 +330,6 @@ function get_imdb_rating(article_name)
 	if (article_name in mapping_dict)
 	{
 		return mapping_dict[article_name];
-	}
-
-	title_lowercase=article_name.toLowerCase();
-	if (title_lowercase in mapping_dict)
-	{
-		console.log(title_lowercase);
-		return mapping_dict[title_lowercase];
 	}
 
 	title_spaces=article_name.split("_").join(" ");
@@ -434,19 +427,26 @@ function process_url(tablink)
 	if (article_type==1) // if the article is for a tv show or movie
 	{
 		// fetch the imdb rating (and the number of votes it received)
-		var rating_arr = get_imdb_rating(article);
-		if (rating_arr!=null)
+		var imdb_id = get_imdb_id(article).split(" ")[0];
+		if (imdb_id!=null)
 		{
-			var count_pretty=String(parseInt(rating_arr[1]).toLocaleString('en-US',{minimumFractionDigits: 2})).split(".")[0];
-			var rating_line = "<b>&nbsp;&nbsp;Rating</b> &nbsp;"+rating_arr[0]+" ("+count_pretty+" reviews)";
+			var imdb_url="https://www.imdb.com/title/"+imdb_id;
+			console.log(imdb_url);
+			var imdb_data = get_http_xml(imdb_url);
 
+			var tag="<strong title=\""
+			var tag_item=imdb_data.split(tag)[1].split(">")[0];
+
+			console.log(tag_item);
+
+			var rating=tag_item.split(" ")[0];
+			var count_pretty=tag_item.split(" ")[3];
+
+			var rating_line = "<b>&nbsp;&nbsp;Rating</b> &nbsp;"+rating+" ("+count_pretty+" reviews)";
 			var img_src=chrome.extension.getURL("/icons/imdb_logo.png");
-			var img_line="<img src=\""+String(img_src)+"\">"
-
+			var img_line="<a href=\""+imdb_url+"\" target=\"_blank\"><img src=\""+img_src+"\"></a>";
 			$("body").append("<p>"+img_line+rating_line+"</p>");
-
 			// need to resize the iframe to accomodate the new content
-			
 		}
 	}
 }
