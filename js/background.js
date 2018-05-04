@@ -38,15 +38,35 @@ var fileURL = chrome.extension.getURL("data/data.tsv");
 var xmlreq = new XMLHttpRequest();
 xmlreq.open("GET",fileURL,false);
 xmlreq.send();
-var mapping=xmlreq.responseText.split("\n");
+var file_items=xmlreq.responseText.split("\n");
 
 var mapping_dict={};
-for (var line_idx=0; line_idx<mapping.length; line_idx++)
+for (var line_idx=0; line_idx<file_items.length; line_idx++)
 {
-	line_items=mapping[line_idx].split("\t");
-	if (line_items.length==2)
+	line_items=file_items[line_idx].split("\t");
+	if (line_items.length==3)
 	{
-		mapping_dict[line_items[0]]=line_items[1];
+		if (line_items[0] in mapping_dict)
+		{
+			var is_same=false;
+			var mapping_entry=mapping_dict[line_items[0]]
+			for (var item_idx=0; item_idx<mapping_entry.length; item_idx++)
+			{
+				var cur_item=mapping_entry[item_idx];
+				if (cur_item[1]==line_items[2])
+				{
+					is_same=true;
+				}
+			}
+			if (!is_same)
+			{
+				mapping_dict[line_items[0]].push([line_items[1],line_items[2]]);
+			}
+		}
+		else
+		{
+			mapping_dict[line_items[0]]=[[line_items[1],line_items[2]]];	
+		}
 	}
 }
 

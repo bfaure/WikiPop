@@ -321,8 +321,9 @@ function get_url(callback)
 	});
 }
 
-// fetches the imdb uid for the article, returns null if not movie or tv show
-function get_imdb_id(article_name)
+// fetches the associated imdb entries, returns null if not movie or tv show
+// returns a list of uids and categories
+function get_imdb_entries(article_name)
 {
 	// dictionary from title to [average rating, number of reviews]
 	var mapping_dict=background.mapping_dict;
@@ -372,7 +373,7 @@ function get_article_type(article)
 				{
 					// we have found that this article is in a category meant 
 					// only for films and tv shows, so return 1
-					return 1;
+					return tags[tag_idx];
 				}				
 			}
 		}
@@ -382,6 +383,13 @@ function get_article_type(article)
 	return -1; 
 }
 
+// replaces common url strings with their appropriate true characters, for
+// fixing movie and tv show titles to fit what would be seen on imdb
+function deurlify(title)
+{
+	title=title.split("%27").join("'");
+	return title;
+}
 
 function process_url(tablink)
 {
@@ -424,10 +432,56 @@ function process_url(tablink)
 	// returns whether (1) or not (-1) the article pertains to a movie or tv show
 	var article_type = get_article_type(article);
 
-	if (article_type==1) // if the article is for a tv show or movie
+	if (article_type!=-1) // if the article is for a tv show or movie
 	{
+		var show_tags=['tvMovie','tvSeries','tvEpisode','tvShort','tvMiniSeries','tvSpecial'];
+		var movie_tags=['movie','short'];
+
+		article=deurlify(article); // replace common url decodings
+
 		// fetch the imdb rating (and the number of votes it received)
-		var imdb_id = get_imdb_id(article).split(" ")[0];
+		var imdb_entries = get_imdb_entries(article);
+		if (imdb_entries==null)
+		{
+			console.log('No match');
+			return;
+		}
+
+		var imdb_id=null;
+		if (imdb_entries.length==1)
+		{
+			imdb_id=imdb_entries[0][0];
+		}
+		else
+		{
+			for (var e_idx=0; e_idx<imdb_entries.length; e_idx++)
+			{
+				var entry_id=imdb_entries[e_idx][0];
+				var entry_cat=imdb_entries[e_idx][1];
+				
+				if (article_type=='film')
+				{
+					if (movie_tags.indexOf(entry_cat)>=0)
+					{
+						imdb_id=entry_id;
+						break;
+					}
+				}
+				else
+				{
+					if (show_tags.indexOf(entry_cat)>=0)
+					{
+						imdb_id=entry_id;
+						break;
+					}
+				}
+			}
+			if (imdb_id==null)
+			{
+				imdb_id=imdb_entries[0][0];	
+			}
+		}
+
 		if (imdb_id!=null)
 		{
 			var imdb_url="https://www.imdb.com/title/"+imdb_id;

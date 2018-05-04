@@ -1,6 +1,6 @@
 
-lines=open('data.tsv','r').read().split('\n')
-f=open('data-clean.tsv','w')
+lines=open('orig_data.tsv','r').read().split('\n')
+f=open('data.tsv','w')
 
 for line in lines:
 	items=line.split('\t')
@@ -8,5 +8,5 @@ for line in lines:
 		time=items[7]
 		try: time=int(time)
 		except: continue
-		if time>10: f.write('%s\t%s\n'%(items[2],items[0]))
+		if time>12: f.write('%s\t%s\t%s\n'%(items[2],items[0],items[1]))
 
