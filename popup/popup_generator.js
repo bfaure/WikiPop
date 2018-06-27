@@ -230,10 +230,12 @@ function make_view_plot(article_name)
 	let len = human_traffic_obj.items.length;
 
 	let views_last_week=0;
+	/*
 	for (let i=human_traffic_obj.items.length-8; i<human_traffic_obj.items.length; i++)
 	{
 		views_last_week+=human_traffic_obj.items[i].views;
 	}
+	*/
 
 	// trimming down to 365 days...
 	short_moving_avg.y = short_moving_avg.y.slice(len-366,len-1);
