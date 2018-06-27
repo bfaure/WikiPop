@@ -1,4 +1,9 @@
 var background = chrome.extension.getBackgroundPage();
+var export_data=
+{
+	views: [],
+	date: [],
+}
 
 $(document).ready (jQueryMain);
 
@@ -37,6 +42,12 @@ function get_view_ranking(article_name)
 		if (data.items[0].articles[i].article==article_name){  return data.items[0].articles[i].rank;  }
 	}
 	return -1;
+}
+
+// returns true if the provided date is a weekend, false o.w.
+var is_weekend =  function(dt){
+    if(dt.getDay() == 6 || dt.getDay() == 0){  return true;  } 
+    return false;
 }
 
 // article name: (with underscores)
@@ -130,49 +141,60 @@ function get_daily_views(article_name,year)
 
 function make_view_plot(article_name)
 {
-	var interval = "daily";
-	var start_date = "20150101";
+	let interval = "daily";
+	let start_date = "20150101";
 
-	var d1 = new Date();
+	let d1 = new Date();
 
-	var current_year = d1.getFullYear();
+	let current_year = d1.getFullYear();
 
-	var current_month = d1.getMonth()+1;
+	let current_month = d1.getMonth()+1;
 	if (current_month<10){  current_month = "0"+String(current_month);  }
 
-	var current_day = d1.getDate();
+	let current_day = d1.getDate();
 	if (current_day<10){  current_day = "0"+String(current_day);  }
 
-	var end_date = String(current_year)+String(current_month)+String(current_day);
+	let end_date = String(current_year)+String(current_month)+String(current_day);
 
-	var human_traffic 	  = get_pageviews_agent(article_name,interval,start_date,end_date,"user");
-	var human_traffic_obj = JSON.parse(human_traffic);
+	let human_traffic 	  = get_pageviews_agent(article_name,interval,start_date,end_date,"user");
+	let human_traffic_obj = JSON.parse(human_traffic);
 
-	var short_moving_avg =
+	let short_moving_avg =
 	{
 		x: [],
 		y: []
 	};
 
-	var long_moving_avg =
+	let long_moving_avg =
 	{
 		x: [],
 		y: [],
 	};
 
-	var daily_views =
+	let daily_views =
 	{
 		x: [],
 		y: [],
 	}
 
-	var n_days_long = 50;
-	var n_days_short = 7;
+	let n_days_long = 50;
+	let n_days_short = 7;
 
-	var total_views = 0;
+	let total_views = 0;
+
+	let weekend_views=0;
+	let weekday_views=0;
 
 	for (var i=0; i<human_traffic_obj.items.length; i++)
 	{
+		export_data.views.push(human_traffic_obj.items[i].views);
+		export_data.date.push(human_traffic_obj.items[i].timestamp);
+
+		let ts=human_traffic_obj.items[i].timestamp;
+		let dt=new Date(parseInt(ts.substring(0,4)),parseInt(ts.substring(4,6))-1,parseInt(ts.substring(7,8)),0,0);
+		if (is_weekend(dt)){  weekend_views+=human_traffic_obj.items[i].views;  }
+		else{                 weekday_views+=human_traffic_obj.items[i].views;  }
+
 		if (i>=n_days_long)
 		{
 			var cur_sum_long = 0;
@@ -204,11 +226,11 @@ function make_view_plot(article_name)
 		}
 		total_views+=human_traffic_obj.items[i].views;
 	}
-	var average_views = total_views/human_traffic_obj.items.length;
-	var len = human_traffic_obj.items.length;
+	let average_views = total_views/human_traffic_obj.items.length;
+	let len = human_traffic_obj.items.length;
 
-	var views_last_week=0;
-	for (var i=human_traffic_obj.items.length-8; i<human_traffic_obj.items.length; i++)
+	let views_last_week=0;
+	for (let i=human_traffic_obj.items.length-8; i<human_traffic_obj.items.length; i++)
 	{
 		views_last_week+=human_traffic_obj.items[i].views;
 	}
@@ -223,7 +245,7 @@ function make_view_plot(article_name)
 	daily_views.y = daily_views.y.slice(len-366,len-1);
 	daily_views.x = daily_views.x.slice(len-366,len-1);
 
-	var short_moving_avg_trace =
+	let short_moving_avg_trace =
 	{
 		name: String(n_days_short)+" MA",
 		x: short_moving_avg.x,
@@ -233,7 +255,7 @@ function make_view_plot(article_name)
 		fill: 'tozeroy'
 	};
 
-	var long_moving_avg_trace =
+	let long_moving_avg_trace =
 	{
 		name: String(n_days_long)+" MA",
 		x: long_moving_avg.x,
@@ -243,7 +265,7 @@ function make_view_plot(article_name)
 	};
 
 
-	var volume_trace =
+	let volume_trace =
 	{
 		name: "Views",
 		x: daily_views.x,
@@ -253,7 +275,7 @@ function make_view_plot(article_name)
 		fill: 'tozeroy'
 	};
 
-	var layout = {
+	let layout = {
 
 		xaxis:
 		{
@@ -294,9 +316,8 @@ function make_view_plot(article_name)
 
 	$("body").append("<div id=\"plot\" style=\"width:263px;height:150px;\"></div>")
 
-	var plot_spot = document.getElementById('plot');
-	//var data = [short_moving_avg_trace,long_moving_avg_trace,volume_trace];
-	var data = [short_moving_avg_trace,long_moving_avg_trace,volume_trace];
+	let plot_spot = document.getElementById('plot');
+	let data = [short_moving_avg_trace,long_moving_avg_trace,volume_trace];
 
 	Plotly.plot
 	(
@@ -306,9 +327,9 @@ function make_view_plot(article_name)
 		{displayModeBar: false}
 	);
 
-	var ret_arr = [average_views,views_last_week];
+	let interest_index=(weekend_views/weekday_views)*100.0
+	let ret_arr = [average_views,views_last_week,interest_index];
 	return ret_arr;
-	//return average_views;
 }
 
 // Provided a referenced to a callback function, finds the URL of the
@@ -410,7 +431,6 @@ function process_url(tablink)
 	article_pretty = article_pretty.split("%C3%A9").join("é");
 	article_pretty = article_pretty.split("%C3%97").join("x").split("%26").join("&");
 
-
 	$("body").append("<div class=\"bg-text\">Popularity</div>");
 	
 	var views_arr = make_view_plot(article); // returns array with [avg_daily_views,views_last_week]
@@ -420,6 +440,9 @@ function process_url(tablink)
 	var avg_daily_views_pretty = String(avg_daily_views.toLocaleString('en-US',{minimumFractionDigits: 2})).split(".")[0];
 	var avg_daily_views_line = "<b>Average Views</b>&nbsp;&nbsp;"+avg_daily_views_pretty+" / day";
 	$("body").append("<p>"+avg_daily_views_line+"</p>");
+
+	let interest_index_line="<b>Interest Index</b>&nbsp;&nbsp;&nbsp;"+String(views_arr[2].toFixed(2))+"%";
+	$("body").append("<p title=\"% of views on the weekend\">"+interest_index_line+"</p>");
 
 	// check if a trending article
 	var rank = get_view_ranking(article);
@@ -503,6 +526,16 @@ function process_url(tablink)
 			// need to resize the iframe to accomodate the new content
 		}
 	}
+
+
+	let csvContent="data:text/csv;charset=utf-8,Date,Views\r\n";
+	for(let q=0; q<export_data.views.length; q+=1){
+		csvContent+=String(export_data.date[q])+","+String(export_data.views[q])+"\r\n";
+	}
+	var data_url=encodeURI(csvContent);
+	let download_name=article+"-view_data.csv";
+	var link="<p><a download=\""+download_name+"\" href=\""+data_url+"\">Export plot data as CSV</a></p>";
+	$("body").append(link);
 }
 
 function jQueryMain () {

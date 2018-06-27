@@ -1,6 +1,6 @@
 {
   "name": "WikiPopularity",
-  "version": "0.0.1.0",
+  "version": "0.0.1.2",
   "manifest_version": 2,
 
   "web_accessible_resources": [ "popup/popup_box.htm","popup/plotly-latest.min.js",
@@ -49,6 +49,7 @@
     "background",
     "tabs",
     "<all_urls>",
-    "storage"
+    "storage",
+    "downloads"
   ]
 }

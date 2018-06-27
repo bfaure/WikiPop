@@ -111,13 +111,14 @@ function process_url(url)
 
 			var iframe_container = document.createElement("div");
 			iframe_container.id = "wiki_frame_container";
-			iframe_container.className = "resizeable";
 			iframe_container.resize="both";
 			iframe_container.overflow="auto";
+			iframe_container.height="100%";
 
 			// create iFrame element to insert later
 			var iFrame = document.createElement("iframe");
 			iFrame.id="wiki_frame";
+			iFrame.resize="both";
 
 			iframe_container.appendChild(iFrame);
 
@@ -138,7 +139,7 @@ function process_url(url)
 
 			// width is set to match the width of the existing box on the article page
 			iFrame.width = "280";
-			iFrame.height = "220";
+			iFrame.height = "240";
 
 			iFrame.align = "right";
 
