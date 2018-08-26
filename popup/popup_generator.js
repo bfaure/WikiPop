@@ -344,34 +344,6 @@ function get_url(callback)
 	});
 }
 
-// fetches the associated imdb entries, returns null if not movie or tv show
-// returns a list of uids and categories
-function get_imdb_entries(article_name)
-{
-	// dictionary from title to [average rating, number of reviews]
-	var mapping_dict=background.mapping_dict;
-
-	if (article_name in mapping_dict)
-	{
-		return mapping_dict[article_name];
-	}
-
-	title_spaces=article_name.split("_").join(" ");
-	if (title_spaces in mapping_dict)
-	{
-		console.log(title_spaces);
-		return mapping_dict[title_spaces];
-	}
-
-	title_spaces_cut=title_spaces.split(" (")[0];
-	if (title_spaces_cut in mapping_dict)
-	{
-		console.log(title_spaces_cut);
-		return mapping_dict[title_spaces_cut];
-	}
-	return null;
-}
-
 // Checks the wikimedia API to see if the current article is a film or movie
 function get_article_type(article)
 {
@@ -410,8 +382,43 @@ function get_article_type(article)
 // fixing movie and tv show titles to fit what would be seen on imdb
 function deurlify(title)
 {
-	title=title.split("%27").join("'");
-	return title;
+	return title.split("+").join("%2B").split("_").join("%20");
+}
+
+// performs IMDb search for the title argument, what is searched depends on 
+// the second category parameter, could be one of ['film','series',television','show','episode']
+function search_imdb(title,category){
+	console.log("category: ",category);
+    let filter_mapping={'film':      "https://www.imdb.com/find?q=[INSERT_HERE]&s=tt&ttype=ft&ref_=fn_ft",
+						'series':         "https://www.imdb.com/find?q=[INSERT_HERE]&s=tt&ttype=tv&ref_=fn_tv",
+						'television':         "https://www.imdb.com/find?q=[INSERT_HERE]&s=tt&ttype=tv&ref_=fn_tv",
+						'show':         "https://www.imdb.com/find?q=[INSERT_HERE]&s=tt&ttype=tv&ref_=fn_tv",
+						'episode': "https://www.imdb.com/find?q=[INSERT_HERE]&s=tt&ttype=ep&ref_=fn_ep"};
+	let query=filter_mapping[category].split("[INSERT_HERE]").join(deurlify(title));
+	let search_data=get_http_xml(query);
+	let sim_dom=document.createElement("div");
+	sim_dom.innerHTML=search_data;
+
+	let first_result=sim_dom.querySelector("td.result_text");
+	let first_result_url="https://www.imdb.com"+first_result.querySelector("a").getAttribute("href").split("?ref")[0];
+
+	let result_data=get_http_xml(first_result_url);
+	sim_dom.innerHTML=result_data;
+
+	let parsed_data={};
+	parsed_data['url']=first_result_url;
+	parsed_data['score']=sim_dom.querySelector("div.ratingValue").innerText.split("\n").join("").trim();
+	parsed_data['volume']=sim_dom.querySelector("div.imdbRating").querySelector("span.small").innerText;
+
+	let metadata=sim_dom.querySelector("div.subtext").innerText.split("|");
+	for(let i=0; i<metadata.length; i+=1){
+		metadata[i]=metadata[i].split("\n").join("").trim();
+		if (i==0){  parsed_data['mpaa']=metadata[i]    }
+		if (i==1){  parsed_data['duration']=metadata[i]}
+		if (i==2){  parsed_data['genre']=metadata[i]   }
+		if (i==3){  parsed_data['date']=metadata[i]    }
+	}
+	return parsed_data;
 }
 
 function process_url(tablink)
@@ -459,76 +466,26 @@ function process_url(tablink)
 
 	if (article_type!=-1) // if the article is for a tv show or movie
 	{
-		var show_tags=['tvMovie','tvSeries','tvEpisode','tvShort','tvMiniSeries','tvSpecial'];
-		var movie_tags=['movie','short'];
+		console.log("article: ",article);
+		console.log("article type",article_type);
 
-		article=deurlify(article); // replace common url decodings
+		results=search_imdb(article,article_type);
 
-		// fetch the imdb rating (and the number of votes it received)
-		var imdb_entries = get_imdb_entries(article);
-		if (imdb_entries==null)
-		{
-			console.log('No match');
-			return;
-		}
+		let rating_line = "<b>&nbsp;&nbsp;Rating</b> &nbsp;"+results['score']+" ("+results['volume']+" reviews)";
+		let mpaa_line = "<b>&nbsp;&nbsp;MPAA Rating</b> &nbsp;"+results['mpaa'];
+		let genre_line = "<b>&nbsp;&nbsp;Genre</b> &nbsp;"+results['genre'];
+		let duration_line = "<b>&nbsp;&nbsp;Duration</b> &nbsp;"+results['duration'];
+		let date_line= "<b>&nbsp;&nbsp;Released</b> &nbsp;"+results['date'];
 
-		var imdb_id=null;
-		if (imdb_entries.length==1)
-		{
-			imdb_id=imdb_entries[0][0];
-		}
-		else
-		{
-			for (var e_idx=0; e_idx<imdb_entries.length; e_idx++)
-			{
-				var entry_id=imdb_entries[e_idx][0];
-				var entry_cat=imdb_entries[e_idx][1];
-				
-				if (article_type=='film')
-				{
-					if (movie_tags.indexOf(entry_cat)>=0)
-					{
-						imdb_id=entry_id;
-						break;
-					}
-				}
-				else
-				{
-					if (show_tags.indexOf(entry_cat)>=0)
-					{
-						imdb_id=entry_id;
-						break;
-					}
-				}
-			}
-			if (imdb_id==null)
-			{
-				imdb_id=imdb_entries[0][0];	
-			}
-		}
+		$("body").append("<div class=\"bg-text\"><a href=\""+results['url']+"\" target=\"_blank\"><div class=\"bg-text\">IMDb Results</div></a></div>");
+		$("body").append("<p>"+rating_line+"</p>");
+		$("body").append("<p>"+mpaa_line+"</p>");
+		$("body").append("<p>"+genre_line+"</p>");
+		$("body").append("<p>"+duration_line+"</p>");
+		$("body").append("<p>"+date_line+"</p>");
 
-		if (imdb_id!=null)
-		{
-			var imdb_url="https://www.imdb.com/title/"+imdb_id;
-			console.log(imdb_url);
-			var imdb_data = get_http_xml(imdb_url);
-
-			var tag="<strong title=\""
-			var tag_item=imdb_data.split(tag)[1].split(">")[0];
-
-			console.log(tag_item);
-
-			var rating=tag_item.split(" ")[0];
-			var count_pretty=tag_item.split(" ")[3];
-
-			var rating_line = "<b>&nbsp;&nbsp;Rating</b> &nbsp;"+rating+" ("+count_pretty+" reviews)";
-			var img_src=chrome.extension.getURL("/icons/imdb_logo.png");
-			var img_line="<a href=\""+imdb_url+"\" target=\"_blank\"><img src=\""+img_src+"\"></a>";
-			$("body").append("<p>"+img_line+rating_line+"</p>");
-			// need to resize the iframe to accomodate the new content
-		}
+		parent.postMessage("message","*"); // resize the iframe to fit imdb stuff
 	}
-
 
 	let csvContent="data:text/csv;charset=utf-8,Date,Views\r\n";
 	for(let q=0; q<export_data.views.length; q+=1){

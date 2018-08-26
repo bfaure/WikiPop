@@ -25,8 +25,6 @@ function set_list_elems()
 	var panel_logo = panel.children[0];
 	var first_panel_elem = panel.children[1];
 
-	console.log(first_panel_elem);
-
 	var new_panel_elem = document.createElement("div");
 	new_panel_elem.className = "portal";
 	new_panel_elem.role = "navigation";
@@ -91,6 +89,8 @@ function add_sizing_elems()
 }
 
 
+
+
 // Used as the callback function for get_url, figures out if we should
 // display the iFrame structure on the current webpage.
 function process_url(url)
@@ -152,6 +152,13 @@ function process_url(url)
     	}
   	});
 }
+
+
+window.addEventListener("message",handleMessage,false);
+function handleMessage(event){
+	document.getElementById("wiki_frame").style.height="445px";
+}
+
 
 // Call get_url function with the process_url function being called
 // after get_url has called callback. The value provided to callback
