@@ -354,24 +354,32 @@ function get_article_type(article)
 
 	var pages = data.query.pages;
 	var first_key = Object.keys(pages)[0];
-	var tags=["film","series","television","show","episode"];
+	let tags=["film","series","television","show","episode"];
+	let tag_cts=[0,0,0,0,0];
 
 	if ("categories" in pages[first_key])
 	{
 		var cats=pages[first_key]["categories"];
 		for (var cat_idx=0; cat_idx<cats.length; cat_idx++)
 		{
-			console.log(cats[cat_idx]["title"]);
 			for (var tag_idx=0; tag_idx<tags.length; tag_idx++)
 			{
-				if (cats[cat_idx]["title"].indexOf(tags[tag_idx])!==-1)
+				if (cats[cat_idx]["title"].toLowerCase().indexOf(tags[tag_idx])!==-1)
 				{
-					// we have found that this article is in a category meant 
-					// only for films and tv shows, so return 1
-					return tags[tag_idx];
+					tag_cts[tag_idx]+=1;
 				}				
 			}
 		}
+	}
+	let max_idx=-1;
+	let max_val=0;
+	for (let i=0; i<tag_cts.length; i+=1){
+		if (tag_cts[i]>max_val){
+			max_idx=i;
+		}
+	}
+	if (max_idx!=-1){
+		return tags[max_idx];
 	}
 	// article categories don't seem to show this article
 	// is a movie or a tv show, return -1
@@ -382,19 +390,27 @@ function get_article_type(article)
 // fixing movie and tv show titles to fit what would be seen on imdb
 function deurlify(title)
 {
-	return title.split("+").join("%2B").split("_").join("%20");
+	title=title.split("+").join("%2B").split("_").join("%20");
+	if (title.indexOf("%20(")!=-1 && title.indexOf("film)")!=-1){
+		title=title.split("%20(")[0];
+	}
+	return title;
 }
 
 // performs IMDb search for the title argument, what is searched depends on 
 // the second category parameter, could be one of ['film','series',television','show','episode']
 function search_imdb(title,category){
+	console.log("title (before): ",title);
+	title=deurlify(title);
 	console.log("category: ",category);
+	console.log("title (after): ",title);
+
     let filter_mapping={'film':      "https://www.imdb.com/find?q=[INSERT_HERE]&s=tt&ttype=ft&ref_=fn_ft",
 						'series':         "https://www.imdb.com/find?q=[INSERT_HERE]&s=tt&ttype=tv&ref_=fn_tv",
 						'television':         "https://www.imdb.com/find?q=[INSERT_HERE]&s=tt&ttype=tv&ref_=fn_tv",
 						'show':         "https://www.imdb.com/find?q=[INSERT_HERE]&s=tt&ttype=tv&ref_=fn_tv",
 						'episode': "https://www.imdb.com/find?q=[INSERT_HERE]&s=tt&ttype=ep&ref_=fn_ep"};
-	let query=filter_mapping[category].split("[INSERT_HERE]").join(deurlify(title));
+	let query=filter_mapping[category].split("[INSERT_HERE]").join(title);
 	let search_data=get_http_xml(query);
 	let sim_dom=document.createElement("div");
 	sim_dom.innerHTML=search_data;
@@ -475,9 +491,6 @@ function process_url(tablink)
 
 	if (article_type!=-1) // if the article is for a tv show or movie
 	{
-		console.log("article: ",article);
-		console.log("article type",article_type);
-
 		results=search_imdb(article,article_type);
 
 		let rating_line = "<b>&nbsp;&nbsp;Rating</b> &nbsp;"+results['score']+" ("+results['volume']+" reviews)";
