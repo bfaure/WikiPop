@@ -123,7 +123,7 @@ function process_url(url)
 			iframe_container.appendChild(iFrame);
 
 			iFrame.src = chrome.extension.getURL("popup/popup_box.htm");
-			iFrame.style = "border:1px solid #a6a6a6;";
+			iFrame.style = "border:1px solid #a6a6a6;margin-left:0.5em";
 
 			// if this is the main page, skip
 			if (url=="https://en.wikipedia.org/wiki/Main_Page")
@@ -139,7 +139,7 @@ function process_url(url)
 
 			// width is set to match the width of the existing box on the article page
 			iFrame.width = "280";
-			iFrame.height = "240";
+			iFrame.height = "244";
 
 			iFrame.align = "right";
 
@@ -156,7 +156,7 @@ function process_url(url)
 
 window.addEventListener("message",handleMessage,false);
 function handleMessage(event){
-	document.getElementById("wiki_frame").style.height="445px";
+	document.getElementById("wiki_frame").style.height="417px";
 }
 
 

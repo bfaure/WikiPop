@@ -440,12 +440,21 @@ function process_url(tablink)
 	article_pretty = article_pretty.split("%C3%A9").join("é");
 	article_pretty = article_pretty.split("%C3%97").join("x").split("%26").join("&");
 
-	$("body").append("<div class=\"bg-text\">Popularity</div>");
+	let csvContent="data:text/csv;charset=utf-8,Date,Views\r\n";
+	for(let q=0; q<export_data.views.length; q+=1){
+		csvContent+=String(export_data.date[q])+","+String(export_data.views[q])+"\r\n";
+	}
+	var data_url=encodeURI(csvContent);
+	let download_name=article+"-view_data.csv";
+	let img_src=chrome.extension.getURL("/icons/download.png");
+	var link="<a title=\"Download Plot Data as CSV\" download=\""+download_name+"\" href=\""+data_url+"\"><img style=\"height:10px;width:10px;float:left;margin-top:3px;margin-left:10px;margin-right:-48px\" src=\""+img_src+"\"/></a>";
+
+	$("body").append("<div class=\"bg-text\">"+link+"Popularity</div>");
 	
 	var views_arr = make_view_plot(article); // returns array with [avg_daily_views,views_last_week]
 	var avg_daily_views = views_arr[0];
 	var views_last_week = views_arr[1];
-
+	
 	var avg_daily_views_pretty = String(avg_daily_views.toLocaleString('en-US',{minimumFractionDigits: 2})).split(".")[0];
 	var avg_daily_views_line = "<b>Average Views</b>&nbsp;&nbsp;"+avg_daily_views_pretty+" / day";
 	$("body").append("<p>"+avg_daily_views_line+"</p>");
@@ -486,15 +495,6 @@ function process_url(tablink)
 
 		parent.postMessage("message","*"); // resize the iframe to fit imdb stuff
 	}
-
-	let csvContent="data:text/csv;charset=utf-8,Date,Views\r\n";
-	for(let q=0; q<export_data.views.length; q+=1){
-		csvContent+=String(export_data.date[q])+","+String(export_data.views[q])+"\r\n";
-	}
-	var data_url=encodeURI(csvContent);
-	let download_name=article+"-view_data.csv";
-	var link="<p><a download=\""+download_name+"\" href=\""+data_url+"\">Export plot data as CSV</a></p>";
-	$("body").append(link);
 }
 
 function jQueryMain () {
