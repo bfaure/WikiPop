@@ -95,7 +95,6 @@ function add_sizing_elems()
 // display the iFrame structure on the current webpage.
 function process_url(url)
 {
-	//console.log(document) // write out for debugging (see chrome console)
 
 	// if this is the home page
 	if (url=="https://www.wikipedia.org/" || url=="https://www.wikipedia.org")
