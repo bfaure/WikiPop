@@ -456,14 +456,9 @@ function process_url(tablink)
 	article_pretty = article_pretty.split("%C3%A9").join("é");
 	article_pretty = article_pretty.split("%C3%97").join("x").split("%26").join("&");
 
-	let csvContent="data:text/csv;charset=utf-8,Date,Views\r\n";
-	for(let q=0; q<export_data.views.length; q+=1){
-		csvContent+=String(export_data.date[q])+","+String(export_data.views[q])+"\r\n";
-	}
-	var data_url=encodeURI(csvContent);
 	let download_name=article+"-view_data.csv";
 	let img_src=chrome.extension.getURL("/icons/download.png");
-	var link="<a title=\"Download Plot Data as CSV\" download=\""+download_name+"\" href=\""+data_url+"\"><img style=\"height:10px;width:10px;float:left;margin-top:3px;margin-left:10px;margin-right:-48px\" src=\""+img_src+"\"/></a>";
+	var link="<a id=\"csv_download\" title=\"Download Plot Data as CSV\" download=\""+download_name+"\" href=\"temp\"><img style=\"height:10px;width:10px;float:left;margin-top:3px;margin-left:10px;margin-right:-48px\" src=\""+img_src+"\"/></a>";
 
 	$("body").append("<div class=\"bg-text\">"+link+"Popularity</div>");
 	
@@ -486,8 +481,16 @@ function process_url(tablink)
 		$("body").append("<p>"+trending_line+"</p>");
 	}
 
-	// returns whether (1) or not (-1) the article pertains to a movie or tv show
 	var article_type = get_article_type(article);
+
+	// add the csv data
+	let csvContent="data:text/csv;charset=utf-8,Date,Views\r\n";
+	for(let q=0; q<export_data.views.length; q+=1){
+		csvContent+=String(export_data.date[q])+","+String(export_data.views[q])+"\r\n";
+	}
+	var data_url=encodeURI(csvContent);
+	document.getElementById("csv_download").href=data_url;
+
 
 	if (article_type!=-1) // if the article is for a tv show or movie
 	{
