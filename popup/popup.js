@@ -88,7 +88,20 @@ function add_sizing_elems()
 	hide_elem_entry.appendChild(hide_link);
 }
 
-
+// returns true if the current page isn't actually for an article (help, etc.)
+function should_skip(url){
+	// if this is not an article page, skip
+	let built_ins=['Help:','Portal:','Wikipedia:','Special:',]
+	for (let i=0; i<built_ins.length; i+=1){
+		if (url.indexOf("/wiki/"+built_ins[i])!=-1){
+			return true;
+		}
+	}
+	if (url.indexOf("w/index.php")!=-1){
+		return true;
+	}
+	return false;
+}
 
 
 // Used as the callback function for get_url, figures out if we should
@@ -130,12 +143,8 @@ function process_url(url)
 				return;
 			}
 
-			// if this is not an article page, skip
-			let built_ins=['Help:','Portal:','Wikipedia:','Special:',]
-			for (let i=0; i<built_ins.length; i+=1){
-				if (url.indexOf("/wiki/"+built_ins[i])!=-1){
-					return;
-				}
+			if (should_skip(url)){
+				return;
 			}
 
 			// width is set to match the width of the existing box on the article page
