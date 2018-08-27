@@ -141,6 +141,7 @@ function get_daily_views(article_name,year)
 
 function make_view_plot(article_name)
 {
+
 	let interval = "daily";
 	let start_date = "20150101";
 
@@ -439,6 +440,7 @@ function search_imdb(title,category){
 
 function process_url(tablink)
 {
+
 	// if this will be a banner, don't add content
 	if (tablink=="https://www.wikipedia.org" || tablink=="https://www.wikipedia.org/")
 	{
@@ -464,7 +466,6 @@ function process_url(tablink)
 	
 	var views_arr = make_view_plot(article); // returns array with [avg_daily_views,views_last_week]
 	var avg_daily_views = views_arr[0];
-	var views_last_week = views_arr[1];
 	
 	var avg_daily_views_pretty = String(avg_daily_views.toLocaleString('en-US',{minimumFractionDigits: 2})).split(".")[0];
 	var avg_daily_views_line = "<b>Average Views</b>&nbsp;&nbsp;"+avg_daily_views_pretty+" / day";

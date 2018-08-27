@@ -104,7 +104,7 @@ function process_url(url)
 
   	chrome.storage.sync.get("enabled",function(obj){
     	if (obj["enabled"]=="true" || obj===null || obj["enabled"]==null)
-    	{
+    	{			
 			// set the WikiClassify list elements in the left panel
 			set_list_elems();
 
@@ -131,7 +131,7 @@ function process_url(url)
 			}
 
 			// if this is not an article page, skip
-			if (url.split(".org")[1].indexOf(":")!=-1)
+			if (url.indexOf("/wiki/Help:")!=-1)
 			{
 				return;
 			}
@@ -157,7 +157,6 @@ window.addEventListener("message",handleMessage,false);
 function handleMessage(event){
 	document.getElementById("wiki_frame").style.height="417px";
 }
-
 
 // Call get_url function with the process_url function being called
 // after get_url has called callback. The value provided to callback
