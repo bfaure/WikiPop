@@ -131,9 +131,11 @@ function process_url(url)
 			}
 
 			// if this is not an article page, skip
-			if (url.indexOf("/wiki/Help:")!=-1)
-			{
-				return;
+			let built_ins=['Help:','Portal:','Wikipedia:','Special:',]
+			for (let i=0; i<built_ins.length; i+=1){
+				if (url.indexOf("/wiki/"+built_ins[i])!=-1){
+					return;
+				}
 			}
 
 			// width is set to match the width of the existing box on the article page
