@@ -125,6 +125,16 @@ function process_url(url)
 			// set the WikiClassify list elements in the left panel
 			set_list_elems();
 
+			// if this is the main page, skip
+			if (url=="https://en.wikipedia.org/wiki/Main_Page")
+			{
+				return;
+			}
+
+			if (should_skip(url)){
+				return;
+			}
+
 			var iframe_container = document.createElement("div");
 			iframe_container.id = "wiki_frame_container";
 			iframe_container.resize="both";
@@ -141,23 +151,11 @@ function process_url(url)
 			iFrame.src = chrome.extension.getURL("popup/popup_box.htm");
 			iFrame.style = "border:1px solid #a6a6a6;margin-left:0.5em;transition:1s all";
 
-			// if this is the main page, skip
-			if (url=="https://en.wikipedia.org/wiki/Main_Page")
-			{
-				return;
-			}
-
-			if (should_skip(url)){
-				return;
-			}
-
 			// width is set to match the width of the existing box on the article page
 			iFrame.width = "280";
 			iFrame.height = "244";
 
 			iFrame.align = "right";
-
-
 			add_sizing_elems();
 
 			var insert_parent = document.getElementById("mw-content-text");
@@ -180,8 +178,8 @@ function handleMessage(event){
 		current_max_height="417px";
 	}
 	if (event.data=="goodreads_resize"){
-		document.getElementById("wiki_frame").style.height="309px";
-		current_max_height="309px";
+		document.getElementById("wiki_frame").style.height="333px";
+		current_max_height="333px";
 	}
 }
 

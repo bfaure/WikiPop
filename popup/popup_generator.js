@@ -1,4 +1,3 @@
-var is_minimized=false;
 var background = chrome.extension.getBackgroundPage();
 var export_data=
 {
@@ -349,10 +348,12 @@ function get_url(callback)
 // Checks the wikimedia API to see if the current article is a film or movie
 function get_article_type(article)
 {
-	var url = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=categories&titles=";
-	url += article+"&clprop=";
+	console.log("get_article_type: ",article);
+
+	var url = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=categories&titles="+article;
 	var data = get_http_xml(url);
 	data     = JSON.parse(data);
+	console.log("mediawiki categories: ",url);
 
 	var pages = data.query.pages;
 	var first_key = Object.keys(pages)[0];
@@ -360,6 +361,7 @@ function get_article_type(article)
 	let tag_cts=[0,0,0,0,0,0,0];
 
 	console.log(pages[first_key]['categories']);
+	console.log(pages[first_key]);
 
 	if ("categories" in pages[first_key])
 	{
@@ -485,8 +487,15 @@ function search_goodreads(title,category){
 	return results;
 }
 
+// uses mediawiki to detect if the url past down to us will actually
+// be redirected to another page (such as when a user searches on wikipedia)
+function detect_redirect(article){
+	
+}
+
 function process_url(tablink)
 {
+	console.log("process_url: ",tablink);
 
 	// if this will be a banner, don't add content
 	if (tablink=="https://www.wikipedia.org" || tablink=="https://www.wikipedia.org/")
@@ -590,9 +599,11 @@ function process_url(tablink)
 		if (book_tags.indexOf(article_type)!=-1){ // if the article is a book
 			results=search_goodreads(article,article_type);
 
-			let rating_line = "<b>&nbsp;&nbsp;Rating</b> &nbsp;"+results['score']+" ("+results['volume']+" reviews)";
+			let rating_line = "<b>&nbsp;&nbsp;Rating</b> &nbsp;&nbsp;"+results['score']+" / 5";
+			let volume_line = "<b>&nbsp;&nbsp;Volume</b> &nbsp;"+results['volume']+" ratings";
 			$("body").append("<div class=\"bg-text\"><a href=\""+results['url']+"\" target=\"_blank\"><div class=\"bg-text\">Goodreads Results</div></a></div>");
 			$("body").append("<p>"+rating_line+"</p>");
+			$("body").append("<p>"+volume_line+"</p>");
 			
 			parent.postMessage("goodreads_resize","*"); // resize the iframe to fit goodreads stuff
 		}
