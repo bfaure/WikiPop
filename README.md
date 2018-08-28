@@ -1,5 +1,5 @@
 # WikiPopularity
-Chrome extension to display the view count on all Wikipedia articles. As of version 0.0.1.0 IMDb ratings are displayed for all articles pertaining to TV shows and movies. The scores are parsed dynamically from the IMDb website, after the name of the movie/TV show is translated into its IMDb UID, for more information see https://www.imdb.com/interfaces/
+Chrome extension to display the view count on all Wikipedia articles. As of version 0.0.1.0 IMDb ratings are displayed for all articles pertaining to TV shows and movies. As of version 0.1.1.0 Goodreads ratings are displayed for all articles pertaining to novels and series. The data from IMDb and Goodreads is scraped directly from the respective sites.
 
 ## Installation
 Most recent version can be installed in the Chrome Extension store, simply search 'WikiPopularity' or follow [this link](https://chrome.google.com/webstore/detail/wikipopularity/mkdacoblmknahnamcloolpfdijekmggm).  Alternatively, the extension can also be installed in developer mode by downloading the .zip and dragging it into your Chrome window after pointing it to 'chrome://extensions'.
