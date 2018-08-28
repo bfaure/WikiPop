@@ -1,3 +1,7 @@
+// global variables
+var current_max_height="244px";
+var is_minimized=false;
+
 
 // low-level function to make a GET HTTPS request, returns response data
 function get_http_xml(url)
@@ -70,7 +74,7 @@ function add_sizing_elems()
 	expand_link.onclick = function()
 	{
 		document.getElementById("wiki_frame").style.display = '';
-		document.getElementById("wiki_frame").height=220;
+		document.getElementById("wiki_frame").height=current_max_height;
 	}
 
 	expand_elem_entry.appendChild(expand_link);
@@ -135,7 +139,7 @@ function process_url(url)
 			iframe_container.appendChild(iFrame);
 
 			iFrame.src = chrome.extension.getURL("popup/popup_box.htm");
-			iFrame.style = "border:1px solid #a6a6a6;margin-left:0.5em";
+			iFrame.style = "border:1px solid #a6a6a6;margin-left:0.5em;transition:1s all";
 
 			// if this is the main page, skip
 			if (url=="https://en.wikipedia.org/wiki/Main_Page")
@@ -163,10 +167,22 @@ function process_url(url)
   	});
 }
 
-
 window.addEventListener("message",handleMessage,false);
 function handleMessage(event){
-	document.getElementById("wiki_frame").style.height="417px";
+	if (event.data=="minimize"){
+		document.getElementById("wiki_frame").style.height="40px";
+	}
+	if (event.data=="maximize"){
+		document.getElementById("wiki_frame").style.height=current_max_height;
+	}
+	if (event.data=="imdb_resize"){
+		document.getElementById("wiki_frame").style.height="417px";
+		current_max_height="417px";
+	}
+	if (event.data=="goodreads_resize"){
+		document.getElementById("wiki_frame").style.height="309px";
+		current_max_height="309px";
+	}
 }
 
 // Call get_url function with the process_url function being called

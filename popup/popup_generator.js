@@ -1,3 +1,4 @@
+var is_minimized=false;
 var background = chrome.extension.getBackgroundPage();
 var export_data=
 {
@@ -355,8 +356,10 @@ function get_article_type(article)
 
 	var pages = data.query.pages;
 	var first_key = Object.keys(pages)[0];
-	let tags=["film","series","television","show","episode"];
-	let tag_cts=[0,0,0,0,0];
+	let tags=["film","series","television","show","episode","Book series","novels"];
+	let tag_cts=[0,0,0,0,0,0,0];
+
+	console.log(pages[first_key]['categories']);
 
 	if ("categories" in pages[first_key])
 	{
@@ -407,14 +410,17 @@ function search_imdb(title,category){
 	console.log("title (after): ",title);
 
     let filter_mapping={'film':      "https://www.imdb.com/find?q=[INSERT_HERE]&s=tt&ttype=ft&ref_=fn_ft",
-						'series':         "https://www.imdb.com/find?q=[INSERT_HERE]&s=tt&ttype=tv&ref_=fn_tv",
-						'television':         "https://www.imdb.com/find?q=[INSERT_HERE]&s=tt&ttype=tv&ref_=fn_tv",
-						'show':         "https://www.imdb.com/find?q=[INSERT_HERE]&s=tt&ttype=tv&ref_=fn_tv",
-						'episode': "https://www.imdb.com/find?q=[INSERT_HERE]&s=tt&ttype=ep&ref_=fn_ep"};
+						'series':    "https://www.imdb.com/find?q=[INSERT_HERE]&s=tt&ttype=tv&ref_=fn_tv",
+						'television':"https://www.imdb.com/find?q=[INSERT_HERE]&s=tt&ttype=tv&ref_=fn_tv",
+						'show':      "https://www.imdb.com/find?q=[INSERT_HERE]&s=tt&ttype=tv&ref_=fn_tv",
+						'episode':   "https://www.imdb.com/find?q=[INSERT_HERE]&s=tt&ttype=ep&ref_=fn_ep"};
 	let query=filter_mapping[category].split("[INSERT_HERE]").join(title);
 	let search_data=get_http_xml(query);
 	let sim_dom=document.createElement("div");
 	sim_dom.innerHTML=search_data;
+
+	console.log("imdb search results...");
+	console.log(sim_dom);
 
 	let first_result=sim_dom.querySelector("td.result_text");
 	let first_result_url="https://www.imdb.com"+first_result.querySelector("a").getAttribute("href").split("?ref")[0];
@@ -433,9 +439,50 @@ function search_imdb(title,category){
 		if (i==0){  parsed_data['mpaa']=metadata[i]    }
 		if (i==1){  parsed_data['duration']=metadata[i]}
 		if (i==2){  parsed_data['genre']=metadata[i]   }
-		if (i==3){  parsed_data['date']=metadata[i]    }
+		if (i==3){  
+			if (metadata[i].indexOf("Episode aired ")!=-1){
+				parsed_data['date']=metadata[i].split("Episode aired ")[1];    	
+			} else {
+				parsed_data['date']=metadata[i];    	
+			}
+		}
 	}
 	return parsed_data;
+}
+
+// searches goodreads for entries pertaining to the provided title
+function search_goodreads(title,category){
+	console.log("search_goodreads()");
+	console.log("title: ",title);
+	console.log("category: ",category);
+
+	title=title.split("_").join("+");
+	let query="https://www.goodreads.com/search?q="+title;
+
+	console.log("goodreads url: ",query);
+
+	let search_data=get_http_xml(query);
+	let sim_dom=document.createElement("div");
+	sim_dom.innerHTML=search_data;
+
+	console.log("goodreads search results...");
+	console.log(sim_dom);
+
+	let results={};
+	results['url']="https://www.goodreads.com"+sim_dom.querySelector("a.bookTitle").getAttribute("href");
+
+	let first_result=sim_dom.querySelector("span.minirating");
+	console.log(first_result);
+
+	let first_result_text=first_result.textContent;
+	console.log(first_result_text)
+
+	results['score']=first_result_text.split("avg")[0].trim();
+	results['volume']=first_result_text.split("—")[1].split(" ratings")[0].trim();
+
+	console.log(results);
+
+	return results;
 }
 
 function process_url(tablink)
@@ -446,6 +493,31 @@ function process_url(tablink)
 	{
 		return;
 	}
+
+	// create minimize and maximize buttons
+	let minimize_button = document.createElement("img");
+	minimize_button.src=chrome.extension.getURL("/icons/minimize.png");
+	minimize_button.style="height:10px;width:10px;position:absolute;float:right;right:16px;top:12px";
+	minimize_button.onclick = function()
+	{
+		parent.postMessage("minimize","*");
+		minimize_button.style.display="none";
+		maximize_button.style.display="inherit";
+	}
+	$("body").append(minimize_button);
+
+	let maximize_button = document.createElement("img");
+	maximize_button.src=chrome.extension.getURL("/icons/maximize.png");
+	maximize_button.style="height:15px;width:15px;position:absolute;float:right;right:14px;top:10px";
+	maximize_button.style.display="none";
+	maximize_button.onclick = function()
+	{
+		parent.postMessage("maximize","*");
+		maximize_button.style.display="none";
+		minimize_button.style.display="inherit";
+	}
+	$("body").append(maximize_button);
+
 
 	// get the article name
 	var article = tablink.split("/wiki/")[1];
@@ -492,25 +564,38 @@ function process_url(tablink)
 	var data_url=encodeURI(csvContent);
 	document.getElementById("csv_download").href=data_url;
 
+	let movie_tv_tags=["film","series","television","show","episode"];
+	let book_tags=["Book series","novels"];
 
-	if (article_type!=-1) // if the article is for a tv show or movie
+	if (article_type!=-1) 
 	{
-		results=search_imdb(article,article_type);
+		if (movie_tv_tags.indexOf(article_type)!=-1){ // if the article is a tv show or movie
+			results=search_imdb(article,article_type);
 
-		let rating_line = "<b>&nbsp;&nbsp;Rating</b> &nbsp;"+results['score']+" ("+results['volume']+" reviews)";
-		let mpaa_line = "<b>&nbsp;&nbsp;MPAA Rating</b> &nbsp;"+results['mpaa'];
-		let genre_line = "<b>&nbsp;&nbsp;Genre</b> &nbsp;"+results['genre'];
-		let duration_line = "<b>&nbsp;&nbsp;Duration</b> &nbsp;"+results['duration'];
-		let date_line= "<b>&nbsp;&nbsp;Released</b> &nbsp;"+results['date'];
+			let rating_line = "<b>&nbsp;&nbsp;Rating</b> &nbsp;"+results['score']+" ("+results['volume']+" reviews)";
+			let mpaa_line = "<b>&nbsp;&nbsp;MPAA Rating</b> &nbsp;"+results['mpaa'];
+			let genre_line = "<b>&nbsp;&nbsp;Genre</b> &nbsp;"+results['genre'];
+			let duration_line = "<b>&nbsp;&nbsp;Duration</b> &nbsp;"+results['duration'];
+			let date_line= "<b>&nbsp;&nbsp;Released</b> &nbsp;"+results['date'];
 
-		$("body").append("<div class=\"bg-text\"><a href=\""+results['url']+"\" target=\"_blank\"><div class=\"bg-text\">IMDb Results</div></a></div>");
-		$("body").append("<p>"+rating_line+"</p>");
-		$("body").append("<p>"+mpaa_line+"</p>");
-		$("body").append("<p>"+genre_line+"</p>");
-		$("body").append("<p>"+duration_line+"</p>");
-		$("body").append("<p>"+date_line+"</p>");
+			$("body").append("<div class=\"bg-text\"><a href=\""+results['url']+"\" target=\"_blank\"><div class=\"bg-text\">IMDb Results</div></a></div>");
+			$("body").append("<p>"+rating_line+"</p>");
+			$("body").append("<p>"+mpaa_line+"</p>");
+			$("body").append("<p>"+genre_line+"</p>");
+			$("body").append("<p>"+duration_line+"</p>");
+			$("body").append("<p>"+date_line+"</p>");
 
-		parent.postMessage("message","*"); // resize the iframe to fit imdb stuff
+			parent.postMessage("imdb_resize","*"); // resize the iframe to fit imdb stuff
+		}
+		if (book_tags.indexOf(article_type)!=-1){ // if the article is a book
+			results=search_goodreads(article,article_type);
+
+			let rating_line = "<b>&nbsp;&nbsp;Rating</b> &nbsp;"+results['score']+" ("+results['volume']+" reviews)";
+			$("body").append("<div class=\"bg-text\"><a href=\""+results['url']+"\" target=\"_blank\"><div class=\"bg-text\">Goodreads Results</div></a></div>");
+			$("body").append("<p>"+rating_line+"</p>");
+			
+			parent.postMessage("goodreads_resize","*"); // resize the iframe to fit goodreads stuff
+		}
 	}
 }
 
