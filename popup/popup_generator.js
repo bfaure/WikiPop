@@ -503,7 +503,7 @@ function process_url(tablink)
 	// create minimize and maximize buttons
 	let minimize_button = document.createElement("img");
 	minimize_button.src=chrome.extension.getURL("/icons/minimize.png");
-	minimize_button.style="height:10px;width:10px;position:absolute;float:right;right:16px;top:12px";
+	minimize_button.style="height:10px;width:10px;position:absolute;float:right;right:16px;top:12px;cursor:pointer";
 	minimize_button.onclick = function()
 	{
 		parent.postMessage("minimize","*");
@@ -514,7 +514,7 @@ function process_url(tablink)
 
 	let maximize_button = document.createElement("img");
 	maximize_button.src=chrome.extension.getURL("/icons/maximize.png");
-	maximize_button.style="height:15px;width:15px;position:absolute;float:right;right:14px;top:10px";
+	maximize_button.style="height:15px;width:15px;position:absolute;float:right;right:14px;top:10px;cursor:pointer";
 	maximize_button.style.display="none";
 	maximize_button.onclick = function()
 	{
