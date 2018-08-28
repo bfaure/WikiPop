@@ -357,7 +357,7 @@ function get_article_type(article)
 
 	var pages = data.query.pages;
 	var first_key = Object.keys(pages)[0];
-	let tags=["film","series","television","show","episode","Book series","novels"];
+	let tags=["novel","film","series","television","show","episode","Book series"];
 	let tag_cts=[0,0,0,0,0,0,0];
 
 	console.log(pages[first_key]['categories']);
@@ -368,6 +368,9 @@ function get_article_type(article)
 		var cats=pages[first_key]["categories"];
 		for (var cat_idx=0; cat_idx<cats.length; cat_idx++)
 		{
+			if (cats[cat_idx]["title"].toLowerCase().indexOf("births")!=-1 || cats[cat_idx]["title"].toLowerCase().indexOf("deaths")!=-1){
+				return -1;
+			}
 			for (var tag_idx=0; tag_idx<tags.length; tag_idx++)
 			{
 				if (cats[cat_idx]["title"].toLowerCase().indexOf(tags[tag_idx])!==-1)
@@ -377,11 +380,13 @@ function get_article_type(article)
 			}
 		}
 	}
+
 	let max_idx=-1;
 	let max_val=0;
 	for (let i=0; i<tag_cts.length; i+=1){
 		if (tag_cts[i]>max_val){
 			max_idx=i;
+			max_val=tag_cts[i];
 		}
 	}
 	if (max_idx!=-1){
@@ -487,16 +492,8 @@ function search_goodreads(title,category){
 	return results;
 }
 
-// uses mediawiki to detect if the url past down to us will actually
-// be redirected to another page (such as when a user searches on wikipedia)
-function detect_redirect(article){
-	
-}
-
 function process_url(tablink)
 {
-	console.log("process_url: ",tablink);
-
 	// if this will be a banner, don't add content
 	if (tablink=="https://www.wikipedia.org" || tablink=="https://www.wikipedia.org/")
 	{
@@ -563,7 +560,8 @@ function process_url(tablink)
 		$("body").append("<p>"+trending_line+"</p>");
 	}
 
-	var article_type = get_article_type(article);
+	let article_type = get_article_type(article);
+	console.log("article_type: ",article_type);
 
 	// add the csv data
 	let csvContent="data:text/csv;charset=utf-8,Date,Views\r\n";
@@ -574,7 +572,7 @@ function process_url(tablink)
 	document.getElementById("csv_download").href=data_url;
 
 	let movie_tv_tags=["film","series","television","show","episode"];
-	let book_tags=["Book series","novels"];
+	let book_tags=["Book series","novel"];
 
 	if (article_type!=-1) 
 	{
