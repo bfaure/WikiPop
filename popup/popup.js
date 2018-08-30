@@ -181,6 +181,10 @@ function handleMessage(event){
 		document.getElementById("wiki_frame").style.height="333px";
 		current_max_height="333px";
 	}
+	if (event.data=="coin_resize"){
+		document.getElementById("wiki_frame").style.height="333px";
+		current_max_height="307px";
+	}
 }
 
 // Call get_url function with the process_url function being called

@@ -504,9 +504,22 @@ function search_coinmarketcap(title){
 
 	let results=sim_dom.querySelector("ul.search-results");
 	
-	let first_result=results.querySelector("a").getAttribute("href");
+	let all_results=results.querySelectorAll("a");
+	console.log("all results.,..");
+	console.log(all_results);
+	let actual_result=null;
+	for (let i=0; i<all_results.length; i++){
+		let current_crypto_name=all_results[i].innerText;
+		console.log(current_crypto_name);
+		if (current_crypto_name.toLowerCase().indexOf(title.toLowerCase())!=-1){
+			actual_result=all_results[i].getAttribute("href");
+			break;
+		}
+	}
 
-	let result_url="https://coinmarketcap.com/"+first_result;
+	//let first_result=results.querySelector("a").getAttribute("href");
+
+	let result_url="https://coinmarketcap.com/"+actual_result;
 	console.log(result_url);
 
 	search_data=get_http_xml(result_url);
@@ -647,7 +660,7 @@ function process_url(tablink)
 			let price_line = "<b>&nbsp;&nbsp;Price</b> &nbsp;&nbsp;"+results['price'];
 			$("body").append("<div class=\"bg-text\"><a href=\""+results['url']+"\" target=\"_blank\"><div class=\"bg-text\">Crypto Price</div></a></div>");
 			$("body").append("<p>"+price_line+"</p>");
-			parent.postMessage("goodreads_resize","*"); // resize the iframe to fit goodreads stuff
+			parent.postMessage("coin_resize","*"); // resize the iframe to fit goodreads stuff
 		}
 	}
 }
