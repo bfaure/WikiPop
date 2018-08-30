@@ -149,7 +149,7 @@ function process_url(url)
 			iframe_container.appendChild(iFrame);
 
 			iFrame.src = chrome.extension.getURL("popup/popup_box.htm");
-			iFrame.style = "border:1px solid #a6a6a6;margin-left:0.5em;transition:1s all";
+			iFrame.style = "border:1px solid #a6a6a6;margin-left:0.5em;transition:0.5s all";
 
 			// width is set to match the width of the existing box on the article page
 			iFrame.width = "280";
@@ -182,7 +182,7 @@ function handleMessage(event){
 		current_max_height="333px";
 	}
 	if (event.data=="coin_resize"){
-		document.getElementById("wiki_frame").style.height="333px";
+		document.getElementById("wiki_frame").style.height="307px";
 		current_max_height="307px";
 	}
 }
