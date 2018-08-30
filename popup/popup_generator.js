@@ -357,8 +357,8 @@ function get_article_type(article)
 
 	var pages = data.query.pages;
 	var first_key = Object.keys(pages)[0];
-	let tags=["novel","film","series","television","show","episode","Book series"];
-	let tag_cts=[0,0,0,0,0,0,0];
+	let tags=["novel","film","series","television","show","episode","book series","cryptocurrencies"];
+	let tag_cts=[0,0,0,0,0,0,0,0];
 
 	console.log(pages[first_key]['categories']);
 	console.log(pages[first_key]);
@@ -492,6 +492,36 @@ function search_goodreads(title,category){
 	return results;
 }
 
+function search_coinmarketcap(title){
+	let url="https://coinmarketcap.com/search/?q="+title.split("_").join("+");
+	console.log(url);
+
+	let search_data=get_http_xml(url);
+	let sim_dom=document.createElement("div");
+	sim_dom.innerHTML=search_data;
+
+	console.log(sim_dom);
+
+	let results=sim_dom.querySelector("ul.search-results");
+	
+	let first_result=results.querySelector("a").getAttribute("href");
+
+	let result_url="https://coinmarketcap.com/"+first_result;
+	console.log(result_url);
+
+	search_data=get_http_xml(result_url);
+	sim_dom=document.createElement("div");
+	sim_dom.innerHTML=search_data;
+
+	console.log(sim_dom);
+
+	let price_holder=sim_dom.querySelector("span#quote_price");
+	console.log(price_holder);
+
+	let price=sim_dom.querySelector("span#quote_price").getAttribute("data-usd");
+	return {'price':"$"+price, 'url':result_url}; 
+}
+
 function process_url(tablink)
 {
 	// if this will be a banner, don't add content
@@ -572,7 +602,8 @@ function process_url(tablink)
 	document.getElementById("csv_download").href=data_url;
 
 	let movie_tv_tags=["film","series","television","show","episode"];
-	let book_tags=["Book series","novel"];
+	let book_tags=["book series","novel"];
+	let crypto_tags=["cryptocurrencies"];
 
 	if (article_type!=-1) 
 	{
@@ -603,6 +634,19 @@ function process_url(tablink)
 			$("body").append("<p>"+rating_line+"</p>");
 			$("body").append("<p>"+volume_line+"</p>");
 			
+			parent.postMessage("goodreads_resize","*"); // resize the iframe to fit goodreads stuff
+		}
+
+		if (crypto_tags.indexOf(article_type)!=-1){
+			console.log("is a cryptocurreny!");
+			if (article.indexOf("_(crypto")!=-1){
+				article=article.split("_(c")[0];
+			}
+			results=search_coinmarketcap(article);
+
+			let price_line = "<b>&nbsp;&nbsp;Price</b> &nbsp;&nbsp;"+results['price'];
+			$("body").append("<div class=\"bg-text\"><a href=\""+results['url']+"\" target=\"_blank\"><div class=\"bg-text\">Crypto Price</div></a></div>");
+			$("body").append("<p>"+price_line+"</p>");
 			parent.postMessage("goodreads_resize","*"); // resize the iframe to fit goodreads stuff
 		}
 	}
