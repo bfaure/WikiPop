@@ -540,7 +540,7 @@ function search_coinmarketcap(title){
 
 	let details_pane=sim_dom.querySelectorAll("div.coin-summary-item-detail");
 	console.log(details_pane);
-	for(let i=0; i<details_pane.length-2; i+=1){
+	for(let i=0; i<2; i+=1){
 		let cur_item=details_pane[i].querySelector("span").querySelector("span").textContent;
 		if (i==0){
 			final_results['market cap']=cur_item;
