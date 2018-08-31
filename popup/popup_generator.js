@@ -508,6 +508,7 @@ function search_coinmarketcap(title){
 	console.log("all results.,..");
 	console.log(all_results);
 	let actual_result=null;
+	title=title.split("_").join(" ");
 	for (let i=0; i<all_results.length; i++){
 		let current_crypto_name=all_results[i].innerText;
 		console.log(current_crypto_name);
@@ -549,6 +550,7 @@ function search_coinmarketcap(title){
 			final_results['volume']=cur_item;
 		}
 	}
+
 	return final_results; 
 }
 
