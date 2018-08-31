@@ -527,12 +527,29 @@ function search_coinmarketcap(title){
 	sim_dom.innerHTML=search_data;
 
 	console.log(sim_dom);
-
-	let price_holder=sim_dom.querySelector("span#quote_price");
-	console.log(price_holder);
+	
+	let percent_change=sim_dom.querySelector("span.h2.text-semi-bold.negative_change");
+	if (percent_change==null){
+		percent_change=sim_dom.querySelector("span.h2.text-semi-bold.positive_change");
+	}
+	percent_change=percent_change.textContent;
 
 	let price=sim_dom.querySelector("span#quote_price").getAttribute("data-usd");
-	return {'price':"$"+price, 'url':result_url}; 
+
+	let final_results={'price':"$"+price, 'url':result_url, 'change':percent_change}
+
+	let details_pane=sim_dom.querySelectorAll("div.coin-summary-item-detail");
+	console.log(details_pane);
+	for(let i=0; i<details_pane.length-2; i+=1){
+		let cur_item=details_pane[i].querySelector("span").querySelector("span").textContent;
+		if (i==0){
+			final_results['market cap']=cur_item;
+		}
+		if (i==1){
+			final_results['volume']=cur_item;
+		}
+	}
+	return final_results; 
 }
 
 function process_url(tablink)
@@ -599,8 +616,9 @@ function process_url(tablink)
 	var rank = get_view_ranking(article);
 	if (rank!=-1)
 	{
-		var trending_line = "<b>Trending</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#"+String(rank)+" Yesterday";
+		var trending_line = "<b style=\"color:green\">Trending</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#"+String(rank)+" Yesterday";
 		$("body").append("<p>"+trending_line+"</p>");
+		parent.postMessage("trending_resize","*");
 	}
 
 	let article_type = get_article_type(article);
@@ -657,9 +675,21 @@ function process_url(tablink)
 			}
 			results=search_coinmarketcap(article);
 
-			let price_line = "<b>&nbsp;&nbsp;Price</b> &nbsp;&nbsp;"+results['price'];
-			$("body").append("<div class=\"bg-text\"><a href=\""+results['url']+"\" target=\"_blank\"><div class=\"bg-text\">Crypto Price</div></a></div>");
+			let price_line = "<b>&nbsp;&nbsp;Price</b> &nbsp;&nbsp;"+results['price']+" ";
+			if (results['change'].indexOf("-")!=-1){
+				price_line=price_line+"<b style=\"color:red;font-weight:normal\">"+results['change']+"</b>";
+			} else {
+				price_line=price_line+"<b style=\"color:green;font-weight:normal\">"+results['change']+"</b>";
+			}
+
+			let market_cap_line="<b>&nbsp;&nbsp;Market Cap</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$"+results['market cap'];
+			let volume_line="<b>&nbsp;&nbsp;Volume (24h)</b> &nbsp;&nbsp;$"+results['volume'];
+
+			$("body").append("<div class=\"bg-text\"><a href=\""+results['url']+"\" target=\"_blank\"><div class=\"bg-text\">CoinMarketCap Results</div></a></div>");
 			$("body").append("<p>"+price_line+"</p>");
+			$("body").append("<p>"+market_cap_line+"</p>");
+			$("body").append("<p>"+volume_line+"</p>");
+
 			parent.postMessage("coin_resize","*"); // resize the iframe to fit goodreads stuff
 		}
 	}

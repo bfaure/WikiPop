@@ -104,6 +104,9 @@ function should_skip(url){
 	if (url.indexOf("w/index.php")!=-1){
 		return true;
 	}
+	if (url.indexOf("(disambiguation)")!=-1){
+		return true;
+	}
 	return false;
 }
 
@@ -173,17 +176,24 @@ function handleMessage(event){
 	if (event.data=="maximize"){
 		document.getElementById("wiki_frame").style.height=current_max_height;
 	}
+	if (event.data=="trending_resize"){
+		document.getElementById("wiki_frame").style.height="273px";
+		current_max_height="273px";
+	}
 	if (event.data=="imdb_resize"){
-		document.getElementById("wiki_frame").style.height="417px";
-		current_max_height="417px";
+		let new_height=(parseInt(current_max_height.split("px")[0])+173).toString()+"px";
+		document.getElementById("wiki_frame").style.height=new_height;
+		current_max_height=new_height;
 	}
 	if (event.data=="goodreads_resize"){
-		document.getElementById("wiki_frame").style.height="333px";
-		current_max_height="333px";
+		let new_height=(parseInt(current_max_height.split("px")[0])+89).toString()+"px";
+		document.getElementById("wiki_frame").style.height=new_height;
+		current_max_height=new_height;
 	}
 	if (event.data=="coin_resize"){
-		document.getElementById("wiki_frame").style.height="307px";
-		current_max_height="307px";
+		let new_height=(parseInt(current_max_height.split("px")[0])+116).toString()+"px";
+		document.getElementById("wiki_frame").style.height=new_height;
+		current_max_height=new_height;
 	}
 }
 
