@@ -509,12 +509,15 @@ function search_coinmarketcap(title){
 	console.log(all_results);
 	let actual_result=null;
 	title=title.split("_").join(" ");
+	let shortest_result_length=10000000000000;
 	for (let i=0; i<all_results.length; i++){
 		let current_crypto_name=all_results[i].innerText;
 		console.log(current_crypto_name);
 		if (current_crypto_name.toLowerCase().indexOf(title.toLowerCase())!=-1){
-			actual_result=all_results[i].getAttribute("href");
-			break;
+			if (current_crypto_name.length<shortest_result_length){
+				shortest_result_length=current_crypto_name.length;
+				actual_result=all_results[i].getAttribute("href");
+			}
 		}
 	}
 
