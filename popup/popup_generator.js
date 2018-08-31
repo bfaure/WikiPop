@@ -412,6 +412,7 @@ function deurlify(title)
 // the second category parameter, could be one of ['film','series',television','show','episode']
 function search_imdb(title,category){
 	console.log("title (before): ",title);
+	title=title.split("_(TV_series")[0];
 	title=deurlify(title);
 	console.log("category: ",category);
 	console.log("title (after): ",title);
@@ -693,9 +694,9 @@ function process_url(tablink)
 			let volume_line="<b>&nbsp;&nbsp;Volume (24h)</b> &nbsp;&nbsp;$"+results['volume'];
 
 			$("body").append("<div class=\"bg-text\"><a href=\""+results['url']+"\" target=\"_blank\"><div class=\"bg-text\">CoinMarketCap Results</div></a></div>");
-			$("body").append("<p>"+price_line+"</p>");
-			$("body").append("<p>"+market_cap_line+"</p>");
-			$("body").append("<p>"+volume_line+"</p>");
+			$("body").append("<p id=\"price_line\">"+price_line+"</p>");
+			$("body").append("<p id=\"market_cap_line\">"+market_cap_line+"</p>");
+			$("body").append("<p id=\"volume_line\">"+volume_line+"</p>");
 
 			parent.postMessage("coin_resize","*"); // resize the iframe to fit goodreads stuff
 		}
