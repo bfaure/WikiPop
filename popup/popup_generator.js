@@ -540,6 +540,8 @@ function search_coinmarketcap(title){
 
 	let price=sim_dom.querySelector("span#quote_price").getAttribute("data-usd");
 
+	price=price.slice(0,8);
+
 	let final_results={'price':"$"+price, 'url':result_url, 'change':percent_change}
 
 	let details_pane=sim_dom.querySelectorAll("div.coin-summary-item-detail");
@@ -641,7 +643,7 @@ function process_url(tablink)
 	let book_tags=["book series","novel"];
 	let crypto_tags=["cryptocurrencies"];
 
-	if (article_type!=-1) 
+	if (article_type!=-1 || article=="Bitcoin") 
 	{
 		if (movie_tv_tags.indexOf(article_type)!=-1){ // if the article is a tv show or movie
 			results=search_imdb(article,article_type);
@@ -673,7 +675,7 @@ function process_url(tablink)
 			parent.postMessage("goodreads_resize","*"); // resize the iframe to fit goodreads stuff
 		}
 
-		if (crypto_tags.indexOf(article_type)!=-1){
+		if (article=="Bitcoin" || crypto_tags.indexOf(article_type)!=-1){
 			console.log("is a cryptocurreny!");
 			if (article.indexOf("_(crypto")!=-1){
 				article=article.split("_(c")[0];
