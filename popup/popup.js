@@ -162,6 +162,12 @@ function process_url(url)
 			add_sizing_elems();
 
 			var insert_parent = document.getElementById("mw-content-text");
+
+			var stacks = document.getElementsByClassName("mw-stack")
+			if (stacks.length > 0) {
+				insert_parent = stacks[0];
+			}
+
 			var insert_spot = insert_parent.childNodes[0];
 			insert_parent.insertBefore(iframe_container,insert_spot);
     	}
