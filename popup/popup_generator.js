@@ -56,6 +56,7 @@ var is_weekend =  function(dt){
 // end: YYYYMMDD format
 function get_pageviews(article_name,increment,start,end)
 {
+	article_name=article_name.split("/").join("%2F")
 	var url = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/";
 	url += "en.wikipedia.org/all-access/all-agents/"+article_name+"/";
 	url += increment+"/"+start+"/"+end;
@@ -69,6 +70,7 @@ function get_pageviews(article_name,increment,start,end)
 // end: YYYYMMDD format
 function get_pageviews_agent(article_name,increment,start,end,agent)
 {
+	article_name=article_name.split("/").join("%2F")
 	var url = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/";
 	url += "en.wikipedia.org/all-access/"+agent+"/"+article_name+"/";
 	url += increment+"/"+start+"/"+end;
@@ -330,7 +332,7 @@ function make_view_plot(article_name)
 		{displayModeBar: false}
 	);
 
-	let interest_index=(weekend_views/weekday_views)*100.0
+	let interest_index=((weekend_views/weekday_views)*100.0)/(2/7)-100;
 	let ret_arr = [average_views,views_last_week,interest_index];
 	return ret_arr;
 }
@@ -617,8 +619,8 @@ function process_url(tablink)
 	var avg_daily_views_line = "<b>Average Views</b>&nbsp;&nbsp;"+avg_daily_views_pretty+" / day";
 	$("body").append("<p>"+avg_daily_views_line+"</p>");
 
-	let interest_index_line="<b>Interest Index</b>&nbsp;&nbsp;&nbsp;"+String(views_arr[2].toFixed(2))+"%";
-	$("body").append("<p title=\"% of views on the weekend\">"+interest_index_line+"</p>");
+	let interest_index_line="<b>Interest Index</b>&nbsp;&nbsp;&nbsp;"+String(views_arr[2].toFixed(2));
+	$("body").append("<p title=\"Weekend vs. Weekday views\">"+interest_index_line+"</p>");
 
 	// check if a trending article
 	var rank = get_view_ranking(article);
