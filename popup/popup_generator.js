@@ -143,7 +143,6 @@ function get_daily_views(article_name,year)
 
 function make_view_plot(article_name)
 {
-
 	let interval = "daily";
 	let start_date = "20150101";
 
@@ -322,7 +321,7 @@ function make_view_plot(article_name)
 	$("body").append("<div id=\"plot\" style=\"width:263px;height:150px;\"></div>")
 
 	let plot_spot = document.getElementById('plot');
-	let data = [short_moving_avg_trace,long_moving_avg_trace,volume_trace];
+	let data = [long_moving_avg_trace,volume_trace];
 
 	Plotly.plot
 	(
@@ -613,8 +612,58 @@ function process_url(tablink)
 	$("body").append("<div class=\"bg-text\">"+link+"Popularity</div>");
 	
 	var views_arr = make_view_plot(article); // returns array with [avg_daily_views,views_last_week]
-	var avg_daily_views = views_arr[0];
 	
+	let maxViewsArr=[];
+	let pastYearViews=export_data.views.slice(export_data.views.length-366,export_data.views.length-1);
+	let pastYearDates=export_data.date.slice(export_data.date.length-366,export_data.date.length-1);
+
+	for (let i=0; i<pastYearViews.length; i+=1){
+		if (maxViewsArr.length<4){
+			let curItem={views: pastYearViews[i],index: i};
+			maxViewsArr.push(curItem);
+		} else {
+			for (let j=0; j<maxViewsArr.length; j+=1){
+				if (pastYearViews[i]>maxViewsArr[j].views){
+					let curItem={views: pastYearViews[i],index: i};
+					maxViewsArr[j]=curItem;
+					break;
+				}
+			}
+		}
+	}
+	$("body").append("<div class=\"bg-text\">Peak Interest This Year</div>");
+
+	for (let i=0; i<maxViewsArr.length; i+=1){
+		let date=pastYearDates[maxViewsArr[i].index];
+		let link="https://www.google.com/search?tbs=cdr%3A1%2Ccd_min%3A";
+		let YEAR=parseInt(date.slice(0,4));
+		let MONTH=parseInt(date.slice(4,6));
+		let DAY=parseInt(date.slice(6,8));
+		let intDay = new Date();
+		intDay.setYear(YEAR);
+		intDay.setMonth(MONTH-1);
+		intDay.setDate(DAY);
+
+		let startDate = new Date(intDay);
+		startDate.setDate(intDay.getDate()-2);
+		let endDate = new Date(intDay);
+		endDate.setDate(intDay.getDate()+1);
+
+		console.log(startDate.getYear())
+		console.log(startDate.getFullYear())
+
+		link+=(startDate.getMonth()+1).toString()+"%2F"+startDate.getDate().toString()+"%2F"+startDate.getFullYear().toString()+"%2Ccd_max%3A"
+		link+=(endDate.getMonth()+1).toString()+"%2F"+endDate.getDate().toString()+"%2F"+endDate.getFullYear().toString()+"&q=";
+		link+="&q="+article.split("_").join("%20");
+
+		let percentAbove=((maxViewsArr[i].views/views_arr[0])*100.0).toString();
+		if (percentAbove.length>5) { percentAbove=percentAbove.slice(0,5)}
+
+		let dateStr = date.slice(4,6)+"/"+date.slice(6,8)+"/"+date.slice(0,4)
+		$("body").append("<p><a target=\"_blank\" href=\""+link+"\">"+dateStr+"</a> "+percentAbove+"% </p>");
+	}
+
+	var avg_daily_views = views_arr[0];
 	var avg_daily_views_pretty = String(avg_daily_views.toLocaleString('en-US',{minimumFractionDigits: 2})).split(".")[0];
 	var avg_daily_views_line = "<b>Average Views</b>&nbsp;&nbsp;"+avg_daily_views_pretty+" / day";
 	$("body").append("<p>"+avg_daily_views_line+"</p>");
